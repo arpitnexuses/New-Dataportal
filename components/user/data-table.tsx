@@ -281,7 +281,7 @@ const getGeneralFilters = (data: DataRow[]) => {
   let titleField = 'Title';
   let industryField = 'Industry';
   let countryField = 'Country';
-  let employeeSizeField = hasNewColumns ? 'No_of_Employees' : 'Employees_Size';
+  let employeeSizeField = 'Employees_Size'; // Default to general user format
   let revenueField = hasNewColumns ? 'Revenue' : 'Annual_Revenue';
 
   // Map fields based on available data
@@ -289,6 +289,15 @@ const getGeneralFilters = (data: DataRow[]) => {
     if (data[0]['Designation']) titleField = 'Designation';
     if (data[0]['Industry_client']) industryField = 'Industry_client';
     if (data[0]['Country_Contact_Person']) countryField = 'Country_Contact_Person';
+    
+    // Special case for employee size - check for all possible field names
+    if (data[0]['no_of_employees']) employeeSizeField = 'no_of_employees';
+    else if (data[0]['No_of_Employees']) employeeSizeField = 'No_of_Employees';
+    else if (data[0]['employees']) employeeSizeField = 'employees';
+  } else {
+    // For general users, also check if we have the alternate field names
+    if (data[0]['employees']) employeeSizeField = 'employees';
+    else if (data[0]['no_of_employees']) employeeSizeField = 'no_of_employees';
   }
 
   // Get unique values for each field
@@ -336,7 +345,20 @@ const getGeneralFilters = (data: DataRow[]) => {
 
 // Add custom filter functions
 const employeeSizeFilter: FilterFn<DataRow> = (row, columnId, value) => {
-  const employeeCount = parseInt(row.getValue<string>(columnId).replace(/[^0-9]/g, '')) || 0;
+  // Try to get the employee size from any of the possible field names
+  const getEmployeeSize = (row: any) => {
+    const possibleFields = ['Employees_Size', 'No_of_Employees', 'employees', 'no_of_employees'];
+    for (const field of possibleFields) {
+      if (row[field]) {
+        return row[field];
+      }
+    }
+    // Fallback to the columnId if none of the known fields are found
+    return row[columnId] || '';
+  };
+
+  const employeeSizeStr = getEmployeeSize(row.original);
+  const employeeCount = parseInt(employeeSizeStr.toString().replace(/[^0-9]/g, '')) || 0;
   
   // Handle both internal codes and display values
   if (value === 'lt100' || value === '< 100') return employeeCount < 100;
@@ -464,6 +486,10 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
         col.toLowerCase().includes('tm_remark') ||
         col.toLowerCase().includes('industry_client') ||
         col.toLowerCase().includes('industry_nexuse')
+      ) || (
+        originalColumns.includes('s_no') || 
+        originalColumns.includes('account_name') || 
+        originalColumns.includes('workmates_remark')
       );
       
       console.log('Debug - Column Visibility:');
@@ -476,8 +502,32 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
         select: true // Always keep select column visible
       };
       
-      // Make all original columns visible
-      originalColumns.forEach(col => {
+      // Determine which columns to use based on user type
+      let displayColumns: string[];
+      
+      if (isWorkmateUser) {
+        // Find workmate columns that have data
+        displayColumns = WORKMATE_USER_COLUMNS.filter(col => 
+          originalColumns.includes(col) && 
+          typeof firstRow[col] !== 'undefined' && 
+          firstRow[col] !== ''
+        );
+      } else {
+        // Find general columns that have data
+        displayColumns = GENERAL_USER_COLUMNS.filter(col => 
+          originalColumns.includes(col) && 
+          typeof firstRow[col] !== 'undefined' && 
+          firstRow[col] !== ''
+        );
+      }
+      
+      // If no standard columns found, fall back to original columns
+      if (displayColumns.length === 0) {
+        displayColumns = originalColumns;
+      }
+      
+      // Make all selected columns visible
+      displayColumns.forEach(col => {
         newVisibility[col] = true;
         console.log(`Setting visibility for column: ${col} to true`);
       });
@@ -516,10 +566,55 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
       col.toLowerCase().includes('tm_remark') ||
       col.toLowerCase().includes('industry_client') ||
       col.toLowerCase().includes('industry_nexuse')
+    ) || (
+      originalColumns.includes('s_no') || 
+      originalColumns.includes('account_name') || 
+      originalColumns.includes('workmates_remark')
     );
     
     console.log('Is Workmate User:', isWorkmateUser);
     console.log('Available columns:', originalColumns);
+    
+    // Determine which standard columns to use
+    const standardColumns = isWorkmateUser ? WORKMATE_USER_COLUMNS : GENERAL_USER_COLUMNS;
+    
+    // Find which standard columns are present in the data
+    const presentStandardColumns = standardColumns.filter(col => {
+      // Check if column exists in the first row
+      return originalColumns.includes(col) && 
+             typeof firstRow[col] !== 'undefined';
+    });
+    
+    console.log('Present standard columns:', presentStandardColumns);
+    
+    // Create a function to get a value from row data with case-insensitive field names
+    const getFieldValue = (rowData: DataRow, field: string) => {
+      // Try exact match
+      if (rowData[field] !== undefined) {
+        return rowData[field];
+      }
+      
+      // Try lowercase version
+      const lowerField = field.toLowerCase();
+      if (rowData[lowerField] !== undefined) {
+        return rowData[lowerField];
+      }
+      
+      // Try uppercase version
+      const upperField = field.toUpperCase();
+      if (rowData[upperField] !== undefined) {
+        return rowData[upperField];
+      }
+      
+      // Try various case variations
+      const fields = Object.keys(rowData);
+      const matchingField = fields.find(f => f.toLowerCase() === field.toLowerCase());
+      if (matchingField) {
+        return rowData[matchingField];
+      }
+      
+      return ''; // Return empty string as fallback
+    };
     
     const defaultColumns: ColumnDef<DataRow>[] = [
       {
@@ -557,9 +652,14 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
       }
     ];
 
-    const dataColumns: ColumnDef<DataRow>[] = originalColumns.map((columnKey, index) => {
+    // Use present standard columns first, then add any remaining original columns
+    const columnsToInclude = [...new Set([...presentStandardColumns, ...originalColumns])];
+    
+    const dataColumns: ColumnDef<DataRow>[] = columnsToInclude.map((columnKey, index) => {
       const baseColumn: Partial<ColumnDef<DataRow>> = {
         accessorKey: columnKey,
+        // Add an accessor function that uses our getFieldValue helper
+        accessorFn: (row) => getFieldValue(row, columnKey),
         header: ({ column }) => {
           return (
             <DropdownMenu>
@@ -604,7 +704,8 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
           )
         },
         cell: ({ row }: { row: Row<DataRow> }) => {
-          const value = row.getValue(columnKey) as string;
+          // Use the already processed value from the accessor function
+          const value = row.getValue(columnKey) as string || '';
           
           // Common styling for both user types
           if ((columnKey === "industry" || columnKey === "industry_client" || columnKey === "industry_nexuses" || 

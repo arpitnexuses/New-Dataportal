@@ -205,25 +205,37 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "The uploaded file contains no data." }, { status: 400 })
     }
 
-    // Get the file headers
-    const fileHeaders = Object.keys(parsedData[0] || {})
-    
-    // Validate headers based on user type
-    const requiredColumns = userType === "workmate" ? WORKMATE_COLUMNS : GENERAL_COLUMNS
-    const missingColumns = requiredColumns.filter(col => !fileHeaders.includes(col))
-    
-    if (missingColumns.length > 0) {
-      return NextResponse.json({ 
-        error: `Missing required columns for ${userType} user type: ${missingColumns.join(", ")}` 
-      }, { status: 400 })
-    }
+    // Process and clean the data
+    const cleanedData = parsedData.map((row, index) => {
+      // Get original headers
+      const originalHeaders = Object.keys(row);
+      
+      // Create a new object for each row
+      const cleanedRow: Record<string, string> = {};
+      
+      // First pass: just directly copy all the data with its original field names
+      originalHeaders.forEach(header => {
+        const value = (row[header] || '').toString().trim();
+        cleanedRow[header] = value;
+        
+        // Also store the same data with lowercase keys to ensure consistent access
+        cleanedRow[header.toLowerCase()] = value;
+      });
+      
+      console.log('Cleaned row with all fields:', cleanedRow);
+      return cleanedRow;
+    });
+
+    // Store the original column names
+    const originalColumns = Object.keys(parsedData[0] || {});
+    const lowerCaseColumns = originalColumns.map(col => col.toLowerCase());
 
     // Create the data file
     const dataFile = await DataFile.create({
       filename: file.name,
       originalName: file.name,
-      columns: fileHeaders,
-      data: parsedData,
+      columns: lowerCaseColumns, // Store lowercase column names for consistency
+      data: cleanedData,
     })
 
     // Create the user with the data file

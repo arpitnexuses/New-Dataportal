@@ -75,20 +75,45 @@ export default function DashboardPage() {
               totalPhones++
             }
 
-            // Process titles
-            const title = record.Title || record.Designation || "Other"
+            // Process titles based on user type
+            // For Workmate users, use "designation" field
+            // For General users, use "title" field
+            const title = record.designation || record.Designation || 
+                         record['designation'] || 
+                         record.title || record.Title || 
+                         record['title'] ||
+                         // Check lowercase versions explicitly
+                         record.designation?.toLowerCase?.() || 
+                         record.title?.toLowerCase?.() || 
+                         "Other"
             titleCounts[title] = (titleCounts[title] || 0) + 1
 
             // Process industries
-            const industry = record.Industry || record.Industry_client || record.Industry_Nexuses || "Other"
+            const industry = record.industry || record.Industry ||
+                           record.industry_client || record.Industry_client ||
+                           record['industry'] || record['industry_client'] ||
+                           record.Industry_Nexuses || record.industry_nexuses ||
+                           (typeof record.industry === 'string' ? record.industry : null) ||
+                           (typeof record.industry_client === 'string' ? record.industry_client : null) ||
+                           "Other"
             industryCounts[industry] = (industryCounts[industry] || 0) + 1
 
             // Process countries
-            const country = record.Country || record.Country_Contact_Person || "Other"
+            const country = record.country || record.Country ||
+                          record.country_contact_person || record.Country_Contact_Person ||
+                          record.company_country || record.Company_Country ||
+                          record['country'] || record['country_contact_person'] || record['company_country'] ||
+                          (typeof record.country === 'string' ? record.country : null) ||
+                          (typeof record.country_contact_person === 'string' ? record.country_contact_person : null) ||
+                          (typeof record.company_country === 'string' ? record.company_country : null) ||
+                          "Other"
             countryCounts[country] = (countryCounts[country] || 0) + 1
 
             // Process technologies
-            const technologies = record.Technologies || ""
+            const technologies = record.technologies || record.Technologies || 
+                              record['technologies'] ||
+                              (typeof record.technologies === 'string' ? record.technologies : null) ||
+                              ""
             if (typeof technologies === 'string' && technologies.trim()) {
               technologies.split(',').map(tech => tech.trim()).filter(tech => tech).forEach(tech => {
                 technologyCounts[tech] = (technologyCounts[tech] || 0) + 1
@@ -96,10 +121,15 @@ export default function DashboardPage() {
             }
 
             // Process employee size
-            const employeeSize = record.No_of_Employees || record.Employees_Size
+            const employeeSize = record.No_of_Employees || record.Employees_Size || 
+                               record.no_of_employees || record.employees || 
+                               record['no_of_employees'] || record['employees'] ||
+                               (typeof record.no_of_employees === 'string' ? record.no_of_employees : null) ||
+                               (typeof record.employees === 'string' ? record.employees : null) ||
+                               null
             if (employeeSize) {
               let sizeRange = "Other"
-              const size = parseInt(employeeSize)
+              const size = parseInt(employeeSize.toString().replace(/[^0-9]/g, ''))
               if (!isNaN(size)) {
                 if (size < 100) sizeRange = "< 100"
                 else if (size <= 500) sizeRange = "100 - 500"
@@ -109,10 +139,15 @@ export default function DashboardPage() {
             }
 
             // Process revenue
-            const revenue = record.Revenue || record.Annual_Revenue
+            const revenue = record.revenue || record.Revenue || 
+                         record.annual_revenue || record.Annual_Revenue || 
+                         record['revenue'] || record['annual_revenue'] ||
+                         (typeof record.revenue === 'string' ? record.revenue : null) || 
+                         (typeof record.annual_revenue === 'string' ? record.annual_revenue : null) || 
+                         null
             if (revenue) {
               let revenueRange = "Other"
-              const rev = parseFloat(revenue.replace(/[^0-9.]/g, ''))
+              const rev = parseFloat(revenue.toString().replace(/[^0-9.]/g, ''))
               if (!isNaN(rev)) {
                 if (rev < 1000000) revenueRange = "< $1M"
                 else if (rev <= 50000000) revenueRange = "$1M - $50M"

@@ -131,49 +131,35 @@ export async function POST(
 
     // Clean and validate the data
     const cleanedData = parsedData.map((row, index) => {
-      // Get original headers from the first row
+      // Get original headers
       const originalHeaders = Object.keys(row);
       console.log('Original headers:', originalHeaders);
-
-      // Create cleaned row with original column names
+      
+      // Create a new object for each row
       const cleanedRow: Record<string, string> = {};
-
-      // Process each header in the original file
+      
+      // First pass: just directly copy all the data with its original field names
       originalHeaders.forEach(header => {
-        // Preserve the original header name but clean the value
-        cleanedRow[header] = (row[header] || '').toString().trim();
-        console.log(`Mapped column: ${header} = ${cleanedRow[header]}`);
+        const value = (row[header] || '').toString().trim();
+        cleanedRow[header] = value;
+        
+        // Also store the same data with lowercase keys to ensure consistent access
+        cleanedRow[header.toLowerCase()] = value;
       });
-
-      // Ensure all required columns exist (with empty values if missing)
-      const isWorkmateData = originalHeaders.some(header => 
-        header.toLowerCase().includes('workmate') ||
-        header.toLowerCase().includes('tm_remark') ||
-        header.toLowerCase().includes('industry_client') ||
-        header.toLowerCase().includes('industry_nexuse')
-      );
-
-      const requiredColumns = isWorkmateData ? WORKMATE_COLUMNS : GENERAL_COLUMNS;
-      requiredColumns.forEach(column => {
-        const columnExists = originalHeaders.some(header => 
-          header.toLowerCase() === column.toLowerCase()
-        );
-        if (!columnExists) {
-          cleanedRow[column] = '';
-        }
-      });
-
+      
+      console.log('Cleaned row with all fields:', cleanedRow);
       return cleanedRow;
     });
 
     // Store the original column names
     const originalColumns = Object.keys(parsedData[0] || {});
+    const lowerCaseColumns = originalColumns.map(col => col.toLowerCase());
 
-    // Create a new data file record with original column names
+    // Create a new data file record with the cleaned data
     const dataFile = await DataFile.create({
       filename: file.name,
       originalName: file.name,
-      columns: originalColumns,
+      columns: lowerCaseColumns, // Store lowercase column names for consistency
       data: cleanedData,
     })
 

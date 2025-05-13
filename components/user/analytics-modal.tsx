@@ -317,7 +317,12 @@ export function AnalyticsModal({ isOpen, onClose, data }: AnalyticsModalProps) {
     return ranges.map(range => ({
       name: range.name,
       value: data.filter(item => {
-        const size = parseInt(item.Employees_Size?.replace(/[^0-9]/g, '') || '0')
+        // Check for all possible employee size field variations
+        const employeeSize = item.Employees_Size || item.No_of_Employees || 
+                            item.employees || item.no_of_employees ||
+                            item['employees'] || item['no_of_employees'] || '0';
+        
+        const size = parseInt(employeeSize?.toString().replace(/[^0-9]/g, '') || '0')
         return size >= range.min && size < range.max
       }).length
     }))
@@ -397,7 +402,12 @@ export function AnalyticsModal({ isOpen, onClose, data }: AnalyticsModalProps) {
         },
         employeeSize: {
           ranges: getEmployeeSizeRanges(data),
-          average: calculateAverage(data, "Employees_Size")
+          average: Math.max(
+            calculateAverage(data, "Employees_Size"),
+            calculateAverage(data, "No_of_Employees"),
+            calculateAverage(data, "employees"),
+            calculateAverage(data, "no_of_employees")
+          )
         },
         annualRevenue: {
           ranges: getRevenueRanges(data),
