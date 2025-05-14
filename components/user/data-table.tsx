@@ -526,10 +526,15 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
         displayColumns = originalColumns;
       }
       
-      // Make all selected columns visible
+      // Make all selected columns visible except s_no
       displayColumns.forEach(col => {
-        newVisibility[col] = true;
-        console.log(`Setting visibility for column: ${col} to true`);
+        // Hide s_no column by default
+        if (col === 's_no') {
+          newVisibility[col] = false;
+        } else {
+          newVisibility[col] = true;
+        }
+        console.log(`Setting visibility for column: ${col} to ${col !== 's_no'}`);
       });
       
       console.log('Final column visibility state:', newVisibility);
@@ -635,7 +640,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
         ),
         cell: ({ row }) => {
           return (
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center w-full">
               <Checkbox
                 checked={row.getIsSelected()}
                 onCheckedChange={(value) => row.toggleSelected(!!value)}
@@ -977,9 +982,11 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
       
       // Check for key columns to pin
       if ('Contact_Name' in firstRow) pinnedColumns.push('Contact_Name');
-      if ('First_Name' in firstRow) pinnedColumns.push('First_Name');
+      if ('contact_name' in firstRow) pinnedColumns.push('contact_name');
+      if ('full_name' in firstRow) pinnedColumns.push('full_name');
       // Remove Last_Name from being pinned
       // if ('Last_Name' in firstRow) pinnedColumns.push('Last_Name');
+      // if ('account_name' in firstRow) pinnedColumns.push('account_name');
       
       // Update column pinning state
       setColumnPinning({ left: pinnedColumns });
@@ -1413,6 +1420,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                         data-state={row.getIsSelected() && "selected"}
                         className={cn(
                           "hover:bg-[#8370FC]/5 cursor-pointer bg-white select-none transition-colors",
+                          row.getIsSelected() ? "bg-[#EAE7FF] border-[#8370FC]/30" : "bg-white",
                           rowIndex === table.getRowModel().rows.length - 1 ? "last:border-b-0" : "border-b border-gray-100"
                         )}
                         onClick={() => {
@@ -1426,7 +1434,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                             className={cn(
                               "text-gray-900 px-4 py-3 bg-white select-none text-sm",
                               cell.column.id === "select" && "pr-0 pl-4 w-[40px]",
-                              row.getIsSelected() && "bg-[#8370FC]/5",
+                              row.getIsSelected() && "bg-[#EAE7FF]",
                               rowIndex === table.getRowModel().rows.length - 1 && cellIndex === 0 && "rounded-bl-lg",
                               rowIndex === table.getRowModel().rows.length - 1 && cellIndex === row.getVisibleCells().length - 1 && "rounded-br-lg",
                               cell.column.getIsPinned() && "sticky z-20 left-0 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]",
@@ -2091,6 +2099,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                     data-state={row.getIsSelected() && "selected"}
                     className={cn(
                       "hover:bg-[#8370FC]/5 cursor-pointer bg-white select-none transition-colors",
+                      row.getIsSelected() ? "bg-[#EAE7FF] border-[#8370FC]/30" : "bg-white",
                       rowIndex === table.getRowModel().rows.length - 1 ? "last:border-b-0" : "border-b border-gray-100"
                     )}
                     onClick={() => {
@@ -2104,7 +2113,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                         className={cn(
                           "text-gray-900 px-4 py-3 bg-white select-none text-sm",
                           cell.column.id === "select" && "pr-0 pl-4 w-[40px]",
-                          row.getIsSelected() && "bg-[#8370FC]/5",
+                          row.getIsSelected() && "bg-[#EAE7FF]",
                           rowIndex === table.getRowModel().rows.length - 1 && cellIndex === 0 && "rounded-bl-lg",
                           rowIndex === table.getRowModel().rows.length - 1 && cellIndex === row.getVisibleCells().length - 1 && "rounded-br-lg",
                           cell.column.getIsPinned() && "sticky z-20 left-0 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]",
