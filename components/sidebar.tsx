@@ -65,7 +65,7 @@ export function Sidebar() {
   }
 
   return (
-    <div className="space-y-4 py-4 flex flex-col h-full bg-[#F6F4FF] text-[#2D2D2D] w-64">
+    <div className="space-y-4 py-4 flex flex-col h-full bg-gradient-to-b from-[#1a1f2e] to-[#2d3748] text-white w-64">
       <div className="px-4 py-2 flex-1">
         <div className="flex items-center justify-center mb-8">
           <Image
@@ -73,7 +73,7 @@ export function Sidebar() {
             alt="Nexus Logo"
             width={200}
             height={200}
-            style={{ filter: "brightness(0) saturate(100%) invert(60%) sepia(0%) saturate(0%) hue-rotate(180deg) brightness(0.5) contrast(1.1)" }}
+            style={{ filter: "brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(180deg) brightness(100%) contrast(100%)" }}
           />
         </div>
         <div className="space-y-1">
@@ -82,14 +82,14 @@ export function Sidebar() {
               key={route.href}
               href={route.href}
               className={cn(
-                "text-base group flex p-3 w-full justify-start font-medium cursor-pointer transition rounded-full",
+                "text-base group flex p-3 w-full justify-start font-medium cursor-pointer transition rounded-lg",
                 pathname === route.href
-                  ? "bg-[#8370FC] text-white shadow-md"
-                  : "text-[#838288] hover:text-[#8370FC] hover:bg-[#E6E1FF] hover:rounded-full"
+                  ? "bg-[#4a5568] text-white shadow-lg"
+                  : "text-gray-300 hover:text-white hover:bg-[#2d3748] hover:rounded-lg"
               )}
             >
               <div className="flex items-center flex-1">
-                <route.icon className={cn("h-5 w-5 mr-3", pathname === route.href ? "text-white" : "text-[#838288] group-hover:text-[#8370FC]")} />
+                <route.icon className={cn("h-5 w-5 mr-3", pathname === route.href ? "text-white" : "text-gray-400 group-hover:text-white")} />
                 {route.label}
               </div>
             </Link>
@@ -100,7 +100,7 @@ export function Sidebar() {
         <Button
           onClick={handleLogout}
           variant="ghost"
-          className="w-full justify-start text-[#838288] hover:text-[#8370FC] hover:bg-[#E6E1FF]"
+          className="w-full justify-start text-gray-300 hover:text-white hover:bg-[#2d3748] rounded-lg"
         >
           <LogOut className="h-5 w-5 mr-3" />
           Logout

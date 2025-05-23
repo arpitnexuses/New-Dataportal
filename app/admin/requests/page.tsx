@@ -284,13 +284,13 @@ export default function RequestsPage() {
                                     <div>
                                       <h4 className="text-sm font-medium text-white/70">Employees</h4>
                                       <p>
-                                        {request.companySize.minEmployees} - {request.companySize.maxEmployees}
+                                        {request.companySize?.minEmployees ?? "N/A"} - {request.companySize?.maxEmployees ?? "N/A"}
                                       </p>
                                     </div>
                                     <div>
                                       <h4 className="text-sm font-medium text-white/70">Revenue</h4>
                                       <p>
-                                        {request.companySize.minRevenue} - {request.companySize.maxRevenue}
+                                        {request.companySize?.minRevenue ?? "N/A"} - {request.companySize?.maxRevenue ?? "N/A"}
                                       </p>
                                     </div>
                                   </div>

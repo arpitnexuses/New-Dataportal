@@ -12,7 +12,7 @@ export default function AccountSettingsPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="text-8xl font-bold text-black tracking-wider"
+          className="text-8xl font-bold text-[#262e3e] tracking-wider"
         >
           {words.map((word, wordIndex) => (
             <span key={wordIndex} className="inline-block mr-12">

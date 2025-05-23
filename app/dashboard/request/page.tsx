@@ -990,7 +990,7 @@ export default function RequestPage() {
         {/* Create ICP Request Card */}
         <Card className="border border-zinc-200 shadow-sm cursor-pointer hover:shadow-md transition bg-zinc-50" onClick={() => setShowForm(true)}>
           <CardHeader className="flex flex-row items-center gap-3">
-            <div className="bg-purple-50 p-2 rounded-full"><FilePlus className="h-6 w-6 text-purple-600" /></div>
+            <div className="bg-purple-50 p-2 rounded-full"><FilePlus className="h-6 w-6 text-[#4f9eb2]" /></div>
             <div>
               <CardTitle className="text-lg">Create ICP Request</CardTitle>
               <CardDescription>Create a new Ideal Customer Profile request</CardDescription>
@@ -1002,21 +1002,22 @@ export default function RequestPage() {
         </Card>
         {/* Upload a Sheet Card */}
         <div className="relative">
-          <Card className="border border-zinc-200 shadow-sm bg-blue-50 select-none pointer-events-none">
-            <CardHeader className="flex flex-row items-center gap-3">
-              <div className="bg-blue-50 p-2 rounded-full"><Upload className="h-6 w-6 text-blue-600" /></div>
+          <Card className="border border-zinc-200 shadow-sm select-none pointer-events-none overflow-hidden relative" style={{ background: 'rgba(79, 158, 178, 0.15)' }}>
+            <div className="absolute inset-0 z-10 backdrop-blur-[2px]" style={{ background: 'rgba(79, 158, 178, 0.15)' }}></div>
+            <CardHeader className="flex flex-row items-center gap-3 relative z-0">
+              <div className="bg-blue-50 p-2 rounded-full"><Upload className="h-6 w-6 text-[#4f9eb2]" /></div>
               <div>
                 <CardTitle className="text-lg">Upload a Target Sheet</CardTitle>
                 <CardDescription>Upload your data sheet for processing and analysis</CardDescription>
               </div>
             </CardHeader>
-            <CardContent className="flex flex-col items-center justify-center py-8">
+            <CardContent className="flex flex-col items-center justify-center py-8 relative z-0">
               <div className="w-full text-center text-zinc-500 font-medium">Click to upload your sheet<br /><span className="text-xs">Supports .xlsx, .xls, .csv</span></div>
             </CardContent>
+            <div className="absolute inset-0 flex items-center justify-center z-20">
+              <span className="text-2xl font-bold" style={{ color: '#4f9eb2' }}>Coming Soon</span>
+            </div>
           </Card>
-          <div className="absolute inset-0 flex items-center justify-center rounded-lg z-10" style={{ backgroundColor: '#E6E1FF', opacity: 0.7 }}>
-            <span className="text-lg font-semibold" style={{ color: '#8370FC' }}>Coming Soon</span>
-          </div>
         </div>
       </div>
       {/* Upload Sheet Modal */}

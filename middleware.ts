@@ -20,10 +20,13 @@ export async function middleware(request: NextRequest) {
   // If token exists, verify it
   if (token) {
     try {
+      console.log("Verifying token in middleware...");
       const payload = await verifyToken(token)
+      console.log("Token payload:", payload);
 
       if (!payload) {
         // Invalid token
+        console.log("Invalid token, redirecting to login...");
         if (isAdminPath || isUserPath) {
           const redirectUrl = isAdminPath ? "/admin" : "/"
           return NextResponse.redirect(new URL(redirectUrl, request.url))
@@ -31,10 +34,12 @@ export async function middleware(request: NextRequest) {
       } else {
         // Valid token
         const isAdmin = payload.role === "admin"
+        console.log("Valid token, user role:", payload.role);
 
         // Redirect logged-in users from login pages
         if (isAdminLoginPath || isUserLoginPath) {
           const redirectUrl = isAdmin ? "/admin/dashboard" : "/dashboard"
+          console.log("Redirecting to:", redirectUrl);
           return NextResponse.redirect(new URL(redirectUrl, request.url))
         }
 
