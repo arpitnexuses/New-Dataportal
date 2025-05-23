@@ -13,7 +13,7 @@ export function AdminSidebar() {
 
   const handleLogout = async () => {
     await fetch("/api/logout", { method: "POST" })
-    router.push("/admin")
+    router.push("/")
     router.refresh()
   }
 

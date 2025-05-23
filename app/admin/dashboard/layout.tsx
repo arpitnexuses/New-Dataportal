@@ -7,11 +7,11 @@ export default function AdminDashboardLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="flex h-screen bg-[#1C1C1C]">
+    <div className="flex h-screen bg-gradient-to-b from-[#1a1f2e] to-[#2d3748]">
       <div className="w-64 h-full">
         <AdminSidebar />
       </div>
-      <div className="flex-1 overflow-auto bg-[#1C1C1C]">{children}</div>
+      <div className="flex-1 overflow-auto bg-gradient-to-b from-[#1a1f2e] to-[#2d3748]">{children}</div>
     </div>
   )
 }

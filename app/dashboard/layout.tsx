@@ -9,10 +9,14 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="flex h-screen">
-      <div className="hidden md:flex">
-        <Sidebar />
+    <div className="flex min-h-screen">
+      {/* Fixed Sidebar for desktop */}
+      <div className="hidden md:block">
+        <div className="fixed top-0 left-0 h-screen w-64 z-30">
+          <Sidebar />
+        </div>
       </div>
+      {/* Mobile Sidebar (Sheet) */}
       <Sheet>
         <SheetTrigger asChild className="md:hidden">
           <Button variant="outline" size="icon" className="fixed top-4 left-4 z-50">
@@ -23,7 +27,8 @@ export default function DashboardLayout({
           <Sidebar />
         </SheetContent>
       </Sheet>
-      <main className="flex-1 overflow-y-auto p-4 md:p-8">
+      {/* Main Content with left margin for sidebar */}
+      <main className="flex-1 p-4 md:p-8 md:ml-64">
         {children}
       </main>
     </div>

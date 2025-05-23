@@ -16,6 +16,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
+import { RadialBarChart, RadialBar } from "@/components/ui/charts"
 
 interface UserData {
   totalFiles: number
@@ -35,9 +36,9 @@ interface UserData {
   credits: number
 }
 
-const COLORS = ['#BFAAFF', '#8370FC', '#A3A1FB', '#C3B1E1', '#B5A7F7', '#BFAAFF', '#8370FC', '#A3A1FB']
-const COUNTRY_COLORS = ['#BFAAFF', '#8370FC', '#A3A1FB', '#C3B1E1', '#B5A7F7', '#BFAAFF', '#8370FC', '#A3A1FB']
-const TECH_COLORS = ['#00B8A9', '#F8F3D4', '#F6416C', '#FFDE7D', '#7868E6', '#B8F2E6']
+const COLORS = ['#78b3fb', '#4ECDC4', '#5ab8e8', '#45B7D1', '#3da5c4', '#2d8ba3']
+const COUNTRY_COLORS = ['#78b3fb', '#4ECDC4', '#5ab8e8', '#45B7D1', '#3da5c4', '#2d8ba3']
+const TECH_COLORS = ['#78b3fb', '#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe', '#dbeafe']
 
 export default function DashboardPage() {
   const [userData, setUserData] = useState<UserData | null>(null)
@@ -46,6 +47,8 @@ export default function DashboardPage() {
   const [showAllIndustries, setShowAllIndustries] = useState(false)
   const [showAllCountries, setShowAllCountries] = useState(false)
   const [showAllTechnologies, setShowAllTechnologies] = useState(false)
+  const [selectedIndustryIndex, setSelectedIndustryIndex] = useState<number | null>(null)
+  const [selectedCountryIndex, setSelectedCountryIndex] = useState<number | null>(null)
 
   const fetchUserData = async () => {
     try {
@@ -336,92 +339,83 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6 bg-white min-h-screen">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
       </div>
       
       {/* Top Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Card className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-200">
+        <Card className="group bg-white rounded-xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_20px_-3px_rgba(0,0,0,0.1),0_15px_25px_-2px_rgba(0,0,0,0.05)] transition-all duration-300 border border-slate-200 hover:border-slate-300 hover:-translate-y-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Files</CardTitle>
-            <div className="bg-green-100 p-3 rounded-full">
-              <FolderOpen className="h-4 w-4 text-green-600" />
+            <CardTitle className="text-sm font-medium text-gray-800 group-hover:text-[#1a1f2e] transition-colors">Total Files</CardTitle>
+            <div className="bg-[#d2e3fc] p-3 rounded-full shadow-sm group-hover:shadow-md transition-all duration-300">
+              <FolderOpen className="h-4 w-4 text-[#1a1f2e] group-hover:scale-110 transition-transform" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-gray-800">{userData?.totalFiles || 0}</div>
-            <p className="text-xs text-gray-500">Files in your database</p>
+            <div className="text-2xl font-bold text-gray-900 group-hover:text-[#1a1f2e] transition-colors">{userData?.totalFiles || 0}</div>
+            <p className="text-xs text-gray-600 group-hover:text-gray-700 transition-colors">Files in your database</p>
           </CardContent>
         </Card>
-        <Card className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-200">
+        <Card className="group bg-white rounded-xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_20px_-3px_rgba(0,0,0,0.1),0_15px_25px_-2px_rgba(0,0,0,0.05)] transition-all duration-300 border border-slate-200 hover:border-slate-300 hover:-translate-y-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Records</CardTitle>
-            <div className="bg-purple-100 p-3 rounded-full">
-              <Database className="h-4 w-4 text-purple-600" />
+            <CardTitle className="text-sm font-medium text-gray-800 group-hover:text-[#1a1f2e] transition-colors">Total Records</CardTitle>
+            <div className="bg-[#d0f5e8] p-3 rounded-full shadow-sm group-hover:shadow-md transition-all duration-300">
+              <Database className="h-4 w-4 text-[#1a1f2e] group-hover:scale-110 transition-transform" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-gray-800">{formatNumber(userData?.totalRecords || 0)}</div>
-            <p className="text-xs text-gray-500">Total records across all files</p>
+            <div className="text-2xl font-bold text-gray-900 group-hover:text-[#1a1f2e] transition-colors">{formatNumber(userData?.totalRecords || 0)}</div>
+            <p className="text-xs text-gray-600 group-hover:text-gray-700 transition-colors">Total records across all files</p>
           </CardContent>
         </Card>
-        <Card className="bg-[#8370FC] text-white relative overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-200">
-          {/* Shining Animation */}
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shine"></div>
-          </div>
-          
-          {/* Ribbon Element */}
-          <div className="absolute top-0 right-0 w-24 h-24 bg-[#8370FC]/20 transform rotate-45 translate-x-12 -translate-y-12"></div>
-          <div className="absolute top-0 right-0 w-24 h-24 bg-[#8370FC]/10 transform rotate-45 translate-x-8 -translate-y-8"></div>
-          
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-            <CardTitle className="text-sm font-medium text-white">Available Credits</CardTitle>
-            <div className="bg-white/20 p-3 rounded-full">
-              <CreditCard className="h-4 w-4 text-white" />
-            </div>
-          </CardHeader>
-          <CardContent className="relative z-10">
-            <div className="text-4xl font-bold">{userData?.credits || 0}</div>
-            <p className="text-xs text-white/80">Credits available for use</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-200">
+        <Card className="group bg-white rounded-xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_20px_-3px_rgba(0,0,0,0.1),0_15px_25px_-2px_rgba(0,0,0,0.05)] transition-all duration-300 border border-slate-200 hover:border-slate-300 hover:-translate-y-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Emails</CardTitle>
-            <div className="bg-orange-100 p-3 rounded-full">
-              <Mail className="h-4 w-4 text-orange-600" />
+            <CardTitle className="text-sm font-medium text-gray-800 group-hover:text-[#1a1f2e] transition-colors">Available Credits</CardTitle>
+            <div className="bg-[#fff9d0] p-3 rounded-full shadow-sm group-hover:shadow-md transition-all duration-300">
+              <CreditCard className="h-4 w-4 text-[#1a1f2e] group-hover:scale-110 transition-transform" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-gray-800">{formatNumber(userData?.totalEmails || 0)}</div>
-            <p className="text-xs text-gray-500">Total email addresses in database</p>
+            <div className="text-2xl font-bold text-gray-900 group-hover:text-[#1a1f2e] transition-colors">{userData?.credits || 0}</div>
+            <p className="text-xs text-gray-600 group-hover:text-gray-700 transition-colors">Credits available for use</p>
           </CardContent>
         </Card>
-        <Card className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-200">
+        <Card className="group bg-white rounded-xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_20px_-3px_rgba(0,0,0,0.1),0_15px_25px_-2px_rgba(0,0,0,0.05)] transition-all duration-300 border border-slate-200 hover:border-slate-300 hover:-translate-y-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Phone Numbers</CardTitle>
-            <div className="bg-pink-100 p-3 rounded-full">
-              <Phone className="h-4 w-4 text-pink-600" />
+            <CardTitle className="text-sm font-medium text-gray-800 group-hover:text-[#1a1f2e] transition-colors">Total Emails</CardTitle>
+            <div className="bg-[#ffe5e0] p-3 rounded-full shadow-sm group-hover:shadow-md transition-all duration-300">
+              <Mail className="h-4 w-4 text-[#1a1f2e] group-hover:scale-110 transition-transform" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-gray-800">{formatNumber(userData?.totalPhones || 0)}</div>
-            <p className="text-xs text-gray-500">Total phone numbers in database</p>
+            <div className="text-2xl font-bold text-gray-900 group-hover:text-[#1a1f2e] transition-colors">{formatNumber(userData?.totalEmails || 0)}</div>
+            <p className="text-xs text-gray-600 group-hover:text-gray-700 transition-colors">Total email addresses in database</p>
           </CardContent>
         </Card>
-        <Card className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-200">
+        <Card className="group bg-white rounded-xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_20px_-3px_rgba(0,0,0,0.1),0_15px_25px_-2px_rgba(0,0,0,0.05)] transition-all duration-300 border border-slate-200 hover:border-slate-300 hover:-translate-y-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Data Requests</CardTitle>
-            <div className="bg-indigo-100 p-3 rounded-full">
-              <FileQuestion className="h-4 w-4 text-indigo-600" />
+            <CardTitle className="text-sm font-medium text-gray-800 group-hover:text-[#1a1f2e] transition-colors">Total Phone Numbers</CardTitle>
+            <div className="bg-[#eae0ff] p-3 rounded-full shadow-sm group-hover:shadow-md transition-all duration-300">
+              <Phone className="h-4 w-4 text-[#1a1f2e] group-hover:scale-110 transition-transform" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-gray-800">{userData?.requestCount || 0}</div>
-            <p className="text-xs text-gray-500">Total data requests made</p>
+            <div className="text-2xl font-bold text-gray-900 group-hover:text-[#1a1f2e] transition-colors">{formatNumber(userData?.totalPhones || 0)}</div>
+            <p className="text-xs text-gray-600 group-hover:text-gray-700 transition-colors">Total phone numbers in database</p>
+          </CardContent>
+        </Card>
+        <Card className="group bg-white rounded-xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_20px_-3px_rgba(0,0,0,0.1),0_15px_25px_-2px_rgba(0,0,0,0.05)] transition-all duration-300 border border-slate-200 hover:border-slate-300 hover:-translate-y-1">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-gray-800 group-hover:text-[#1a1f2e] transition-colors">Data Requests</CardTitle>
+            <div className="bg-[#ffd0e8] p-3 rounded-full shadow-sm group-hover:shadow-md transition-all duration-300">
+              <FileQuestion className="h-4 w-4 text-[#1a1f2e] group-hover:scale-110 transition-transform" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-gray-900 group-hover:text-[#1a1f2e] transition-colors">{userData?.requestCount || 0}</div>
+            <p className="text-xs text-gray-600 group-hover:text-gray-700 transition-colors">Total data requests made</p>
           </CardContent>
         </Card>
       </div>
@@ -431,49 +425,53 @@ export default function DashboardPage() {
         {/* Title and Revenue Distribution */}
         <div className="col-span-2 grid grid-cols-2 gap-4">
           {/* Title Distribution */}
-          <Card>
+          <Card className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-slate-200">
             <CardHeader>
-              <CardTitle>Title Distribution</CardTitle>
+              <CardTitle className="text-slate-800 font-semibold">Title Distribution</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="h-[400px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart 
                     data={getTop6Titles()}
-                    margin={{ top: 20, right: 10, left: 10, bottom: 20 }}
+                    layout="vertical"
+                    margin={{ top: 20, right: 30, left: 120, bottom: 20 }}
                     onClick={() => setShowAllTitles(true)}
                   >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis 
-                      dataKey="name"
-                      interval={0}
-                      height={60}
-                      tick={({ x, y, payload }) => {
-                        const label = payload.value.length > 10 ? payload.value.slice(0, 10) + '...' : payload.value;
-                        return (
-                          <g transform={`translate(${x},${y + 10}) rotate(-45)`}>
-                            <text textAnchor="end" fontSize={12} fill="#888">{label}</text>
-                          </g>
-                        );
-                      }}
-                    />
+                    <defs>
+                      <linearGradient id="titleGradient" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="5%" stopColor="#78b3fb" stopOpacity={0.8}/>
+                        <stop offset="95%" stopColor="#78b3fb" stopOpacity={0.9}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" horizontal={true} vertical={false} />
+                    <XAxis type="number" tick={{ fill: '#475569', fontSize: 12 }} />
                     <YAxis 
-                      tick={{ fontSize: 12 }}
+                      dataKey="name" 
+                      type="category"
+                      width={120}
+                      tick={{ fill: '#475569', fontSize: 12 }}
                     />
                     <Tooltip 
                       formatter={(value: number) => [`Count: ${value}`, 'Total']}
-                      labelStyle={{ color: 'black' }}
+                      labelStyle={{ color: '#1e293b', fontWeight: 600 }}
+                      contentStyle={{ 
+                        backgroundColor: 'white',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+                      }}
                     />
                     <Bar
                       dataKey="count"
-                      fill="#8370FC"
-                      radius={[999, 999, 0, 0]}
+                      fill="url(#titleGradient)"
+                      radius={[0, 4, 4, 0]}
                       cursor="pointer"
                     >
                       {getTop6Titles().map((entry, index) => (
                         <Cell 
                           key={`cell-${index}`} 
-                          fill="#8370FC"
+                          fill="url(#titleGradient)"
                         />
                       ))}
                     </Bar>
@@ -484,62 +482,16 @@ export default function DashboardPage() {
           </Card>
 
           {/* Revenue Distribution */}
-          <Card>
+          <Card className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-slate-200">
             <CardHeader>
-              <CardTitle>Revenue Distribution</CardTitle>
+              <CardTitle className="text-slate-800 font-semibold">Revenue Distribution</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="h-[400px]">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart 
-                    data={userData?.fileAnalytics.revenueSize}
-                    margin={{ top: 20, right: 10, left: 10, bottom: 20 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis 
-                      dataKey="name"
-                      interval={0}
-                      tick={{ fontSize: 12 }}
-                    />
-                    <YAxis 
-                      tick={{ fontSize: 12 }}
-                    />
-                    <Tooltip 
-                      formatter={(value: number) => [`Companies: ${value}`, 'Total']}
-                      labelStyle={{ color: 'black' }}
-                    />
-                    <Bar
-                      dataKey="value"
-                      fill="#BFAAFF"
-                      radius={[4, 4, 0, 0]}
-                    >
-                      {userData?.fileAnalytics.revenueSize.map((entry, index) => (
-                        <Cell 
-                          key={`cell-${index}`} 
-                          fill="#BFAAFF"
-                        />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Industry and Country Distribution */}
-        <div className="col-span-2 grid grid-cols-2 gap-4">
-          {/* Industry Distribution */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Industry Distribution</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[400px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart onClick={() => setShowAllIndustries(true)}>
+                  <PieChart>
                     <Pie
-                      data={getTop8Industries()}
+                      data={userData?.fileAnalytics.revenueSize}
                       cx="50%"
                       cy="50%"
                       innerRadius={90}
@@ -568,8 +520,96 @@ export default function DashboardPage() {
                             textAnchor={x > cx ? 'start' : 'end'}
                             dominantBaseline="central"
                             style={{
-                              fill: '#888888',
-                              color: '#888888',
+                              fill: '#475569',
+                              color: '#475569',
+                              fontSize: 14,
+                              fontWeight: 500,
+                              paintOrder: 'stroke',
+                              stroke: 'white',
+                              strokeWidth: 0.5,
+                            }}
+                          >
+                            <tspan x={x} dy="-0.5em">{userData?.fileAnalytics.revenueSize[index]?.name}</tspan>
+                            <tspan x={x} dy="1.2em">{`(${value})`}</tspan>
+                          </text>
+                        );
+                      }}
+                    >
+                      {userData?.fileAnalytics.revenueSize.map((entry, index) => (
+                        <Cell 
+                          key={`cell-${index}`} 
+                          fill={`hsl(${index * 45}, 70%, 60%)`}
+                          stroke="white"
+                          strokeWidth={2}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip 
+                      formatter={(value: number, name: string) => [`Count: ${value}`, name]}
+                      contentStyle={{ 
+                        backgroundColor: 'white',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+                      }}
+                    />
+                    <Legend 
+                      layout="horizontal" 
+                      verticalAlign="bottom" 
+                      align="center"
+                      wrapperStyle={{
+                        paddingTop: '20px'
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Industry and Country Distribution */}
+        <div className="col-span-2 grid grid-cols-2 gap-4">
+          {/* Industry Distribution */}
+          <Card className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-slate-200">
+            <CardHeader>
+              <CardTitle className="text-slate-800 font-semibold">Industry Distribution</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[400px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <defs>
+                      {getTop8Industries().map((entry, index) => (
+                        <linearGradient key={`industryGradient-${index}`} id={`industryGradient-${index}`} x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor={COLORS[index % COLORS.length]} stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor={COLORS[index % COLORS.length]} stopOpacity={0.9}/>
+                        </linearGradient>
+                      ))}
+                    </defs>
+                    <Pie
+                      data={getTop8Industries()}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={90}
+                      outerRadius={120}
+                      paddingAngle={2}
+                      cornerRadius={8}
+                      dataKey="value"
+                      label={({ cx, cy, midAngle, innerRadius, outerRadius, value, index }) => {
+                        const RADIAN = Math.PI / 180;
+                        const radius = 25 + innerRadius + (outerRadius - innerRadius);
+                        const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                        const y = cy + radius * Math.sin(-midAngle * RADIAN);
+                        return (
+                          <text
+                            x={x}
+                            y={y}
+                            textAnchor={x > cx ? 'start' : 'end'}
+                            dominantBaseline="central"
+                            style={{
+                              fill: '#475569',
+                              color: '#475569',
                               fontSize: 14,
                               fontWeight: 500,
                               paintOrder: 'stroke',
@@ -582,22 +622,35 @@ export default function DashboardPage() {
                           </text>
                         );
                       }}
+                      onClick={(_, index) => {
+                        setSelectedIndustryIndex(index);
+                        setShowAllIndustries(true);
+                      }}
                     >
                       {getTop8Industries().map((entry, index) => (
                         <Cell 
                           key={`cell-${index}`} 
-                          fill={COLORS[index % COLORS.length]}
+                          fill={`url(#industryGradient-${index})`}
                           cursor="pointer"
                         />
                       ))}
                     </Pie>
                     <Tooltip 
                       formatter={(value: number, name: string) => [`Count: ${value}`, name]}
+                      contentStyle={{ 
+                        backgroundColor: 'white',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+                      }}
                     />
                     <Legend 
                       layout="horizontal" 
                       verticalAlign="bottom" 
                       align="center"
+                      wrapperStyle={{
+                        paddingTop: '20px'
+                      }}
                     />
                   </PieChart>
                 </ResponsiveContainer>
@@ -606,14 +659,22 @@ export default function DashboardPage() {
           </Card>
 
           {/* Country Distribution */}
-          <Card>
+          <Card className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-slate-200">
             <CardHeader>
-              <CardTitle>Country Distribution</CardTitle>
+              <CardTitle className="text-slate-800 font-semibold">Country Distribution</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="h-[400px]">
                 <ResponsiveContainer width="100%" height="100%">
-                  <PieChart onClick={() => setShowAllCountries(true)}>
+                  <PieChart>
+                    <defs>
+                      {getTop8Countries().map((entry, index) => (
+                        <linearGradient key={`countryGradient-${index}`} id={`countryGradient-${index}`} x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor={COUNTRY_COLORS[index % COUNTRY_COLORS.length]} stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor={COUNTRY_COLORS[index % COUNTRY_COLORS.length]} stopOpacity={0.9}/>
+                        </linearGradient>
+                      ))}
+                    </defs>
                     <Pie
                       data={getTop8Countries()}
                       cx="50%"
@@ -623,20 +684,11 @@ export default function DashboardPage() {
                       paddingAngle={2}
                       cornerRadius={8}
                       dataKey="value"
-                      label={({
-                        cx,
-                        cy,
-                        midAngle,
-                        innerRadius,
-                        outerRadius,
-                        value,
-                        index,
-                      }) => {
+                      label={({ cx, cy, midAngle, innerRadius, outerRadius, value, index }) => {
                         const RADIAN = Math.PI / 180;
                         const radius = 25 + innerRadius + (outerRadius - innerRadius);
                         const x = cx + radius * Math.cos(-midAngle * RADIAN);
                         const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
                         return (
                           <text
                             x={x}
@@ -644,8 +696,8 @@ export default function DashboardPage() {
                             textAnchor={x > cx ? 'start' : 'end'}
                             dominantBaseline="central"
                             style={{
-                              fill: '#888888',
-                              color: '#888888',
+                              fill: '#475569',
+                              color: '#475569',
                               fontSize: 14,
                               fontWeight: 500,
                               paintOrder: 'stroke',
@@ -658,22 +710,35 @@ export default function DashboardPage() {
                           </text>
                         );
                       }}
+                      onClick={(_, index) => {
+                        setSelectedCountryIndex(index);
+                        setShowAllCountries(true);
+                      }}
                     >
                       {getTop8Countries().map((entry, index) => (
                         <Cell 
                           key={`cell-${index}`} 
-                          fill={COUNTRY_COLORS[index % COUNTRY_COLORS.length]}
+                          fill={`url(#countryGradient-${index})`}
                           cursor="pointer"
                         />
                       ))}
                     </Pie>
                     <Tooltip 
                       formatter={(value: number, name: string) => [`Count: ${value}`, name]}
+                      contentStyle={{ 
+                        backgroundColor: 'white',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+                      }}
                     />
                     <Legend 
                       layout="horizontal" 
                       verticalAlign="bottom" 
                       align="center"
+                      wrapperStyle={{
+                        paddingTop: '20px'
+                      }}
                     />
                   </PieChart>
                 </ResponsiveContainer>
@@ -683,7 +748,7 @@ export default function DashboardPage() {
         </div>
 
         {/* All Industries Modal */}
-        <Dialog open={showAllIndustries} onOpenChange={setShowAllIndustries}>
+        <Dialog open={showAllIndustries} onOpenChange={(open) => { setShowAllIndustries(open); if (!open) setSelectedIndustryIndex(null); }}>
           <DialogContent className="max-w-[90vw] w-[800px] h-[80vh]">
             <DialogHeader>
               <DialogTitle>All Industries Distribution</DialogTitle>
@@ -712,9 +777,15 @@ export default function DashboardPage() {
                   />
                   <Bar
                     dataKey="value"
-                    fill="#4ECDC4"
                     radius={[0, 4, 4, 0]}
-                  />
+                  >
+                    {userData?.fileAnalytics.industries.map((entry, index) => (
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={selectedIndustryIndex !== null ? COLORS[selectedIndustryIndex % COLORS.length] : COLORS[index % COLORS.length]}
+                      />
+                    ))}
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -722,7 +793,7 @@ export default function DashboardPage() {
         </Dialog>
 
         {/* All Countries Modal */}
-        <Dialog open={showAllCountries} onOpenChange={setShowAllCountries}>
+        <Dialog open={showAllCountries} onOpenChange={(open) => { setShowAllCountries(open); if (!open) setSelectedCountryIndex(null); }}>
           <DialogContent className="max-w-[90vw] w-[800px] h-[80vh]">
             <DialogHeader>
               <DialogTitle>All Countries Distribution</DialogTitle>
@@ -751,9 +822,15 @@ export default function DashboardPage() {
                   />
                   <Bar
                     dataKey="value"
-                    fill={COUNTRY_COLORS[0]}
                     radius={[0, 4, 4, 0]}
-                  />
+                  >
+                    {userData?.fileAnalytics.countries.map((entry, index) => (
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={selectedCountryIndex !== null ? COUNTRY_COLORS[selectedCountryIndex % COUNTRY_COLORS.length] : COUNTRY_COLORS[index % COUNTRY_COLORS.length]}
+                      />
+                    ))}
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -763,9 +840,9 @@ export default function DashboardPage() {
         {/* Technology and Employee Size Distribution */}
         <div className="col-span-2 grid grid-cols-2 gap-4">
           {/* Technology Distribution */}
-          <Card>
+          <Card className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-slate-200">
             <CardHeader>
-              <CardTitle>Technology Distribution</CardTitle>
+              <CardTitle className="text-slate-800 font-semibold">Technology Distribution</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="h-[400px]">
@@ -775,32 +852,46 @@ export default function DashboardPage() {
                     margin={{ top: 20, right: 30, left: 50, bottom: 60 }}
                     onClick={() => setShowAllTechnologies(true)}
                   >
-                    <CartesianGrid strokeDasharray="3 3" />
+                    <defs>
+                      <linearGradient id="techGradient" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="5%" stopColor="#78b3fb" stopOpacity={0.8}/>
+                        <stop offset="95%" stopColor="#78b3fb" stopOpacity={0.9}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                     <XAxis 
                       dataKey="name"
                       angle={-45}
                       textAnchor="end"
                       height={60}
                       interval={0}
-                      tick={{ fontSize: 12 }}
+                      tick={{ fill: '#475569', fontSize: 12 }}
+                      tickLine={{ stroke: '#cbd5e1' }}
                     />
                     <YAxis 
-                      tick={{ fontSize: 12 }}
+                      tick={{ fill: '#475569', fontSize: 12 }}
+                      tickLine={{ stroke: '#cbd5e1' }}
                     />
                     <Tooltip 
                       formatter={(value: number) => [`Count: ${value}`, 'Total']}
-                      labelStyle={{ color: 'black' }}
+                      labelStyle={{ color: '#1e293b', fontWeight: 600 }}
+                      contentStyle={{ 
+                        backgroundColor: 'white',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+                      }}
                     />
                     <Bar
                       dataKey="value"
-                      fill="#8370FC"
-                      radius={[999, 999, 0, 0]}
+                      fill="url(#techGradient)"
+                      radius={[4, 4, 0, 0]}
                       cursor="pointer"
                     >
                       {getTop6Technologies().map((entry, index) => (
                         <Cell 
                           key={`cell-${index}`} 
-                          fill="#8370FC"
+                          fill="url(#techGradient)"
                         />
                       ))}
                     </Bar>
@@ -811,42 +902,51 @@ export default function DashboardPage() {
           </Card>
 
           {/* Employee Size Distribution */}
-          <Card>
+          <Card className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-slate-200">
             <CardHeader>
-              <CardTitle>Employee Size Distribution</CardTitle>
+              <CardTitle className="text-slate-800 font-semibold">Employee Size Distribution</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="h-[400px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart 
                     data={userData?.fileAnalytics.employeeSize}
-                    margin={{ top: 20, right: 30, left: 50, bottom: 60 }}
+                    layout="vertical"
+                    margin={{ top: 20, right: 30, left: 120, bottom: 20 }}
                   >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis 
-                      dataKey="name"
-                      angle={-45}
-                      textAnchor="end"
-                      height={60}
-                      interval={0}
-                      tick={{ fontSize: 12 }}
-                    />
+                    <defs>
+                      <linearGradient id="employeeGradient" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="5%" stopColor="#78b3fb" stopOpacity={0.8}/>
+                        <stop offset="95%" stopColor="#78b3fb" stopOpacity={0.9}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" horizontal={true} vertical={false} />
+                    <XAxis type="number" tick={{ fill: '#475569', fontSize: 12 }} />
                     <YAxis 
-                      tick={{ fontSize: 12 }}
+                      dataKey="name" 
+                      type="category"
+                      width={120}
+                      tick={{ fill: '#475569', fontSize: 12 }}
                     />
                     <Tooltip 
                       formatter={(value: number) => [`Companies: ${value}`, 'Total']}
-                      labelStyle={{ color: 'black' }}
+                      labelStyle={{ color: '#1e293b', fontWeight: 600 }}
+                      contentStyle={{ 
+                        backgroundColor: 'white',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+                      }}
                     />
                     <Bar
                       dataKey="value"
-                      fill="#BFAAFF"
-                      radius={[4, 4, 0, 0]}
+                      fill="url(#employeeGradient)"
+                      radius={[0, 4, 4, 0]}
                     >
                       {userData?.fileAnalytics.employeeSize.map((entry, index) => (
                         <Cell 
                           key={`cell-${index}`} 
-                          fill="#BFAAFF"
+                          fill="url(#employeeGradient)"
                         />
                       ))}
                     </Bar>
@@ -859,9 +959,9 @@ export default function DashboardPage() {
 
         {/* All Technologies Modal */}
         <Dialog open={showAllTechnologies} onOpenChange={setShowAllTechnologies}>
-          <DialogContent className="max-w-[90vw] w-[800px] h-[80vh]">
+          <DialogContent className="max-w-[90vw] w-[800px] h-[80vh] bg-gradient-to-br from-slate-50 to-slate-100/50 border border-slate-200">
             <DialogHeader>
-              <DialogTitle>All Technologies Distribution</DialogTitle>
+              <DialogTitle className="text-slate-800 font-semibold">All Technologies Distribution</DialogTitle>
             </DialogHeader>
             <div className="h-[calc(80vh-100px)] overflow-auto">
               <ResponsiveContainer width="100%" height={Math.max(600, (userData?.fileAnalytics.technologies.length || 0) * 40)}>
@@ -870,24 +970,38 @@ export default function DashboardPage() {
                   layout="vertical"
                   margin={{ top: 20, right: 30, left: 180, bottom: 20 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" />
+                  <defs>
+                    <linearGradient id="allTechGradient" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="5%" stopColor="#78b3fb" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#78b3fb" stopOpacity={0.9}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                   <XAxis 
                     type="number"
-                    tick={{ fontSize: 12 }}
+                    tick={{ fill: '#475569', fontSize: 12 }}
+                    tickLine={{ stroke: '#cbd5e1' }}
                   />
                   <YAxis 
                     dataKey="name" 
                     type="category"
                     width={170}
-                    tick={{ fontSize: 12 }}
+                    tick={{ fill: '#475569', fontSize: 12 }}
+                    tickLine={{ stroke: '#cbd5e1' }}
                   />
                   <Tooltip 
                     formatter={(value: number) => [`Count: ${value}`, 'Total']}
-                    labelStyle={{ color: 'black' }}
+                    labelStyle={{ color: '#1e293b', fontWeight: 600 }}
+                    contentStyle={{ 
+                      backgroundColor: 'white',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+                    }}
                   />
                   <Bar
                     dataKey="value"
-                    fill={TECH_COLORS[0]}
+                    fill="url(#allTechGradient)"
                     radius={[0, 4, 4, 0]}
                   />
                 </BarChart>
@@ -898,9 +1012,9 @@ export default function DashboardPage() {
 
         {/* All Titles Modal */}
         <Dialog open={showAllTitles} onOpenChange={setShowAllTitles}>
-          <DialogContent className="max-w-[90vw] w-[800px] h-[80vh]">
+          <DialogContent className="max-w-[90vw] w-[800px] h-[80vh] bg-gradient-to-br from-slate-50 to-slate-100/50 border border-slate-200">
             <DialogHeader>
-              <DialogTitle>All Titles Distribution</DialogTitle>
+              <DialogTitle className="text-slate-800 font-semibold">All Titles Distribution</DialogTitle>
             </DialogHeader>
             <div className="h-[calc(80vh-100px)] overflow-auto">
               <ResponsiveContainer width="100%" height={Math.max(600, (userData?.fileAnalytics.titleDistribution.length || 0) * 40)}>
@@ -909,30 +1023,44 @@ export default function DashboardPage() {
                   layout="vertical"
                   margin={{ top: 20, right: 30, left: 120, bottom: 20 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" />
+                  <defs>
+                    <linearGradient id="allTitlesGradient" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="5%" stopColor="#78b3fb" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#78b3fb" stopOpacity={0.9}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                   <XAxis 
                     type="number"
-                    tick={{ fontSize: 12 }}
+                    tick={{ fill: '#475569', fontSize: 12 }}
+                    tickLine={{ stroke: '#cbd5e1' }}
                   />
                   <YAxis 
                     dataKey="name" 
                     type="category"
                     width={170}
-                    tick={{ fontSize: 12 }}
+                    tick={{ fill: '#475569', fontSize: 12 }}
+                    tickLine={{ stroke: '#cbd5e1' }}
                   />
                   <Tooltip 
                     formatter={(value: number) => [`Count: ${value}`, 'Total']}
-                    labelStyle={{ color: 'black' }}
+                    labelStyle={{ color: '#1e293b', fontWeight: 600 }}
+                    contentStyle={{ 
+                      backgroundColor: 'white',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+                    }}
                   />
                   <Bar
                     dataKey="count"
-                    fill={COLORS[0]}
+                    fill="url(#allTitlesGradient)"
                     radius={[0, 4, 4, 0]}
                   >
                     {userData?.fileAnalytics.titleDistribution.map((entry, index) => (
                       <Cell 
                         key={`cell-${index}`} 
-                        fill={COLORS[index % COLORS.length]}
+                        fill="url(#allTitlesGradient)"
                       />
                     ))}
                   </Bar>

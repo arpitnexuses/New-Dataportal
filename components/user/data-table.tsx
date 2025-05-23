@@ -497,48 +497,42 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
       console.log('Original columns:', originalColumns);
       console.log('Is Workmate User:', isWorkmateUser);
       
-      // Initialize visibility state with all columns visible
-      const newVisibility: VisibilityState = {
+      // Initialize visibility state with essential columns only
+      const initialVisibility: VisibilityState = {
         select: true // Always keep select column visible
       };
       
-      // Determine which columns to use based on user type
-      let displayColumns: string[];
+      // Define essential columns based on user type
+      const essentialColumns = isWorkmateUser ? [
+        'contact_name',
+        'account_name',
+        'designation',
+        'industry_client',
+        'country_contact_person'
+      ] : [
+        'full_name',
+        'company_name',
+        'email',
+        'personal_phone',
+        'industry'
+      ];
       
-      if (isWorkmateUser) {
-        // Find workmate columns that have data
-        displayColumns = WORKMATE_USER_COLUMNS.filter(col => 
-          originalColumns.includes(col) && 
-          typeof firstRow[col] !== 'undefined' && 
-          firstRow[col] !== ''
-        );
-      } else {
-        // Find general columns that have data
-        displayColumns = GENERAL_USER_COLUMNS.filter(col => 
-          originalColumns.includes(col) && 
-          typeof firstRow[col] !== 'undefined' && 
-          firstRow[col] !== ''
-        );
-      }
-      
-      // If no standard columns found, fall back to original columns
-      if (displayColumns.length === 0) {
-        displayColumns = originalColumns;
-      }
-      
-      // Make all selected columns visible except s_no
-      displayColumns.forEach(col => {
-        // Hide s_no column by default
-        if (col === 's_no') {
-          newVisibility[col] = false;
-        } else {
-          newVisibility[col] = true;
+      // Set visibility for essential columns
+      essentialColumns.forEach(col => {
+        if (originalColumns.includes(col)) {
+          initialVisibility[col] = true;
         }
-        console.log(`Setting visibility for column: ${col} to ${col !== 's_no'}`);
       });
       
-      console.log('Final column visibility state:', newVisibility);
-      setColumnVisibility(newVisibility);
+      // Hide all other columns
+      originalColumns.forEach(col => {
+        if (!essentialColumns.includes(col) && col !== 'select') {
+          initialVisibility[col] = false;
+        }
+      });
+      
+      console.log('Final column visibility state:', initialVisibility);
+      setColumnVisibility(initialVisibility);
     }
   }, [userData, selectedFileIndex]);
 
@@ -672,7 +666,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  className="h-8 -ml-3 font-medium text-gray-100 bg-[#8370FC] hover:text-white hover:bg-[#6f5de7] tracking-wide text-sm"
+                  className="h-8 -ml-3 font-medium text-gray-100 bg-[#4f9eb2] hover:text-white hover:bg-[#3e7e8e] tracking-wide text-sm"
                 >
                   <span>{COLUMN_DISPLAY_NAMES[columnKey.toLowerCase()] || columnKey.replace(/_/g, ' ')}</span>
                   <ChevronDown className="ml-1 h-3.5 w-3.5 opacity-70" />
@@ -682,13 +676,13 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                 <DropdownMenuLabel className="text-sm text-gray-500 font-normal">Sort</DropdownMenuLabel>
                 <DropdownMenuItem 
                   onClick={() => column.toggleSorting(false)}
-                  className="text-sm hover:bg-[#8370FC]/10 focus:bg-[#8370FC]/10 cursor-pointer"
+                  className="text-sm hover:bg-[#4f9eb2]/10 focus:bg-[#4f9eb2]/10 cursor-pointer"
                 >
                   Ascending
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                   onClick={() => column.toggleSorting(true)}
-                  className="text-sm hover:bg-[#8370FC]/10 focus:bg-[#8370FC]/10 cursor-pointer"
+                  className="text-sm hover:bg-[#4f9eb2]/10 focus:bg-[#4f9eb2]/10 cursor-pointer"
                 >
                   Descending
                 </DropdownMenuItem>
@@ -755,7 +749,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                   title={value} // Show full text on hover
                 >
                   <div 
-                    className="w-2 h-2 rounded-full mr-2 flex-shrink-0 bg-[#8370FC]"
+                    className="w-2 h-2 rounded-full mr-2 flex-shrink-0 bg-[#4f9eb2]"
                   />
                   <span className="text-sm text-gray-700 font-medium truncate">
                     {value}
@@ -787,7 +781,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                 className="text-black h-6 flex items-center whitespace-nowrap overflow-hidden text-ellipsis max-w-[230px] gap-1.5 group"
                 title={value}
               >
-                <Mail className="h-3.5 w-3.5 text-[#8370FC] flex-shrink-0 opacity-70 group-hover:opacity-100" />
+                <Mail className="h-3.5 w-3.5 text-[#4f9eb2] flex-shrink-0 opacity-70 group-hover:opacity-100" />
                 <span className="truncate">{value}</span>
               </div>
             );
@@ -800,7 +794,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                 className="text-black h-6 flex items-center whitespace-nowrap overflow-hidden text-ellipsis max-w-[180px] gap-1.5 group"
                 title={value}
               >
-                <Phone className="h-3.5 w-3.5 text-[#8370FC] flex-shrink-0 opacity-70 group-hover:opacity-100" />
+                <Phone className="h-3.5 w-3.5 text-[#4f9eb2] flex-shrink-0 opacity-70 group-hover:opacity-100" />
                 <span className="truncate">{value}</span>
               </div>
             );
@@ -813,7 +807,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                 className="text-black max-w-[180px] truncate h-6 flex items-center gap-1.5 group"
                 title={value}
               >
-                <Globe className="h-3.5 w-3.5 text-[#8370FC] flex-shrink-0 opacity-70 group-hover:opacity-100" />
+                <Globe className="h-3.5 w-3.5 text-[#4f9eb2] flex-shrink-0 opacity-70 group-hover:opacity-100" />
                 <span className="truncate">{value}</span>
               </div>
             );
@@ -826,7 +820,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                 className="text-black max-w-[180px] truncate h-6 flex items-center gap-1.5 group"
                 title={value}
               >
-                <LinkedinIcon className="h-3.5 w-3.5 text-[#8370FC] flex-shrink-0 opacity-70 group-hover:opacity-100" />
+                <LinkedinIcon className="h-3.5 w-3.5 text-[#4f9eb2] flex-shrink-0 opacity-70 group-hover:opacity-100" />
                 <span className="truncate">{value}</span>
               </div>
             );
@@ -839,7 +833,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                 className="text-black h-6 flex items-center whitespace-nowrap overflow-hidden text-ellipsis max-w-[180px] gap-1.5 group"
                 title={value}
               >
-                <Building2 className="h-3.5 w-3.5 text-[#8370FC] flex-shrink-0 opacity-70 group-hover:opacity-100" />
+                <Building2 className="h-3.5 w-3.5 text-[#4f9eb2] flex-shrink-0 opacity-70 group-hover:opacity-100" />
                 <span className="truncate">{value}</span>
               </div>
             );
@@ -852,7 +846,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                 className="text-black h-6 flex items-center whitespace-nowrap overflow-hidden text-ellipsis max-w-[180px] gap-1.5 group"
                 title={value}
               >
-                <MapPin className="h-3.5 w-3.5 text-[#8370FC] flex-shrink-0 opacity-70 group-hover:opacity-100" />
+                <MapPin className="h-3.5 w-3.5 text-[#4f9eb2] flex-shrink-0 opacity-70 group-hover:opacity-100" />
                 <span className="truncate">{value}</span>
               </div>
             );
@@ -865,7 +859,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                 className="text-black h-6 flex items-center whitespace-nowrap overflow-hidden text-ellipsis max-w-[180px]"
                 title={value}
               >
-                <Info className="h-3.5 w-3.5 text-[#8370FC] flex-shrink-0 opacity-70 mr-1.5" />
+                <Info className="h-3.5 w-3.5 text-[#4f9eb2] flex-shrink-0 opacity-70 mr-1.5" />
                 <span className="truncate">{value}</span>
               </div>
             );
@@ -1020,7 +1014,6 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
         setPageSize(updater.pageSize);
       }
     },
-    onColumnPinningChange: setColumnPinning,
     state: {
       sorting,
       columnFilters,
@@ -1030,12 +1023,10 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
       pagination: {
         pageIndex,
         pageSize,
-      },
-      columnPinning,
+      }
     },
     enableRowSelection: true,
     enableMultiRowSelection: true,
-    enableColumnPinning: true,
     manualPagination: false,
   })
 
@@ -1268,37 +1259,26 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                               const firstRow = userData?.dataFiles[selectedFileIndex]?.data[0];
                               const isWorkmateUser = firstRow && ('workmates_remark' in firstRow || 'tm_remarks' in firstRow);
                               
-                              // Define essential columns based on user type
+                              // Define essential columns based on user type - limited to 5 most important
                               const essentialColumns = isWorkmateUser ? [
-                                's_no',
-                                'account_name',
                                 'contact_name',
+                                'account_name',
                                 'designation',
-                                'email_id',
-                                'contact_number_personal',
                                 'industry_client',
-                                'technologies',
-                                'revenue',
-                                'city',
-                                'state'
+                                'country_contact_person'
                               ] : [
                                 'full_name',
-                                'title',
                                 'company_name',
                                 'email',
                                 'personal_phone',
-                                'industry',
-                                'technologies'
+                                'industry'
                               ];
-                              
-                              const newVisibility: VisibilityState = {};
-                              
+                              const presetVisibility: VisibilityState = {};
                               // First hide all columns except select
                               table.getAllLeafColumns().forEach(column => {
-                                newVisibility[column.id] = column.id === 'select' || essentialColumns.includes(column.id);
+                                presetVisibility[column.id] = column.id === 'select' || essentialColumns.includes(column.id);
                               });
-                              
-                              table.setColumnVisibility(newVisibility);
+                              table.setColumnVisibility(presetVisibility);
                             }}
                           >
                             Essential Only
@@ -1308,13 +1288,13 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                             size="sm" 
                             className="h-7 text-xs border-gray-200 text-gray-700"
                             onClick={() => {
-                              const newVisibility: VisibilityState = {};
+                              const presetVisibility: VisibilityState = {};
                               table.getAllLeafColumns().forEach(column => {
                                 if (column.id !== "select") {
-                                  newVisibility[column.id] = true;
+                                  presetVisibility[column.id] = true;
                                 }
                               });
-                              table.setColumnVisibility(newVisibility);
+                              table.setColumnVisibility(presetVisibility);
                             }}
                           >
                             Show All
@@ -1324,13 +1304,13 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                             size="sm" 
                             className="h-7 text-xs border-gray-200 text-gray-700"
                             onClick={() => {
-                              const newVisibility: VisibilityState = {};
+                              const presetVisibility: VisibilityState = {};
                               table.getAllLeafColumns().forEach(column => {
                                 if (column.id !== "select") {
-                                  newVisibility[column.id] = false;
+                                  presetVisibility[column.id] = false;
                                 }
                               });
-                              table.setColumnVisibility(newVisibility);
+                              table.setColumnVisibility(presetVisibility);
                             }}
                           >
                             Hide All
@@ -1375,99 +1355,84 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
               </div>
             </div>
 
-            <div className="rounded-lg bg-white border border-gray-200 overflow-hidden">
-              <Table className="select-none w-full bg-white relative">
-                <TableHeader>
-                  {table.getHeaderGroups().map((headerGroup) => (
-                    <TableRow 
-                      key={headerGroup.id} 
-                      className="border-none select-none"
-                    >
-                      {headerGroup.headers.map((header, index) => (
-                        <TableHead 
-                          key={header.id} 
-                          className={cn(
-                            "text-gray-100 font-medium bg-[#8370FC] px-4 py-3 first:rounded-tl-lg last:rounded-tr-lg border-b border-[#8370FC]/25 select-none text-sm",
-                            header.id === "select" && "w-[40px] pr-0",
-                            header.column.getIsPinned() && "sticky z-30 left-0 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]",
-                            header.column.getIsPinned() && index > 0 && "left-[40px]",
-                            header.column.getIsPinned() && index > 1 && "left-[calc(40px+200px)]",
-                            header.column.getIsPinned() && index > 2 && "left-[calc(40px+400px)]",
-                            !header.column.getIsPinned() && "relative z-10" // Lower z-index for unpinned columns
-                          )}
-                          style={{
-                            left: header.column.getIsPinned() && index > 0 ? 
-                              `${40 + (index - 1) * 180}px` : // Position pinned columns with proper spacing
-                              header.column.getIsPinned() ? 0 : undefined
-                          }}
-                        >
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
-                        </TableHead>
-                      ))}
-                    </TableRow>
-                  ))}
-                </TableHeader>
-                <TableBody className="bg-white select-none">
-                  {table.getRowModel().rows?.length ? (
-                    table.getRowModel().rows.map((row, rowIndex) => (
-                      <TableRow
-                        key={row.id}
-                        data-state={row.getIsSelected() && "selected"}
-                        className={cn(
-                          "hover:bg-[#8370FC]/5 cursor-pointer bg-white select-none transition-colors",
-                          row.getIsSelected() ? "bg-[#EAE7FF] border-[#8370FC]/30" : "bg-white",
-                          rowIndex === table.getRowModel().rows.length - 1 ? "last:border-b-0" : "border-b border-gray-100"
-                        )}
-                        onClick={() => {
-                          setSelectedRow(row.original)
-                          setIsRowDetailsOpen(true)
-                        }}
+            <div className="rounded-xl bg-white border border-gray-100 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+                <Table className="select-none w-full bg-white relative">
+                  <TableHeader>
+                    {table.getHeaderGroups().map((headerGroup) => (
+                      <TableRow 
+                        key={headerGroup.id} 
+                        className="border-none select-none"
                       >
-                        {row.getVisibleCells().map((cell, cellIndex) => (
-                          <TableCell 
-                            key={cell.id} 
+                        {headerGroup.headers.map((header, index) => (
+                          <TableHead 
+                            key={header.id} 
                             className={cn(
-                              "text-gray-900 px-4 py-3 bg-white select-none text-sm",
-                              cell.column.id === "select" && "pr-0 pl-4 w-[40px]",
-                              row.getIsSelected() && "bg-[#EAE7FF]",
-                              rowIndex === table.getRowModel().rows.length - 1 && cellIndex === 0 && "rounded-bl-lg",
-                              rowIndex === table.getRowModel().rows.length - 1 && cellIndex === row.getVisibleCells().length - 1 && "rounded-br-lg",
-                              cell.column.getIsPinned() && "sticky z-20 left-0 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]",
-                              cell.column.getIsPinned() && cellIndex > 0 && "left-[40px]",
-                              cell.column.getIsPinned() && cellIndex > 1 && "left-[calc(40px+200px)]",
-                              cell.column.getIsPinned() && cellIndex > 2 && "left-[calc(40px+400px)]",
-                              !cell.column.getIsPinned() && "relative z-0" // Lower z-index for unpinned columns
+                              "text-gray-600 font-medium bg-white px-6 py-4 first:rounded-tl-xl last:rounded-tr-xl border-b border-gray-100 select-none text-sm transition-all duration-200",
+                              header.id === "select" && "w-[40px] pr-0",
+                              "relative z-10"
                             )}
-                            style={{ 
-                              userSelect: 'none', 
-                              WebkitUserSelect: 'none',
-                              left: cell.column.getIsPinned() && cellIndex > 0 ? 
-                                `${40 + (cellIndex - 1) * 180}px` : // Position pinned columns with proper spacing
-                                cell.column.getIsPinned() ? 0 : undefined
-                            }}
                           >
-                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                          </TableCell>
+                            {header.isPlaceholder
+                              ? null
+                              : flexRender(
+                                  header.column.columnDef.header,
+                                  header.getContext()
+                                )}
+                          </TableHead>
                         ))}
                       </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell
-                        colSpan={columns.length}
-                        className="h-24 text-center text-gray-400 bg-white select-none rounded-b-lg"
-                      >
-                        No results.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+                    ))}
+                  </TableHeader>
+                  <TableBody className="bg-white select-none">
+                    {table.getRowModel().rows?.length ? (
+                      table.getRowModel().rows.map((row, rowIndex) => (
+                        <TableRow
+                          key={row.id}
+                          data-state={row.getIsSelected() && "selected"}
+                          className={cn(
+                            "hover:bg-gray-50/50 cursor-pointer bg-white select-none transition-all duration-200",
+                            row.getIsSelected() ? "bg-[#EAE7FF] border-[#8370FC]/30" : "bg-white",
+                            rowIndex === table.getRowModel().rows.length - 1 ? "last:border-b-0" : "border-b border-gray-100",
+                            "hover:shadow-sm"
+                          )}
+                          onClick={() => {
+                            setSelectedRow(row.original)
+                            setIsRowDetailsOpen(true)
+                          }}
+                        >
+                          {row.getVisibleCells().map((cell, cellIndex) => (
+                            <TableCell 
+                              key={cell.id} 
+                              className={cn(
+                                "text-gray-600 px-6 py-4 bg-white select-none text-sm transition-all duration-200",
+                                cell.column.id === "select" && "pr-0 pl-6 w-[40px]",
+                                row.getIsSelected() && "bg-[#EAE7FF]",
+                                rowIndex === table.getRowModel().rows.length - 1 && cellIndex === 0 && "rounded-bl-xl",
+                                rowIndex === table.getRowModel().rows.length - 1 && cellIndex === row.getVisibleCells().length - 1 && "rounded-br-xl",
+                                "relative z-0"
+                              )}
+                              style={{ 
+                                userSelect: 'none', 
+                                WebkitUserSelect: 'none'
+                              }}
+                            >
+                              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell
+                          colSpan={columns.length}
+                          className="h-24 text-center text-gray-400 bg-white select-none rounded-b-xl"
+                        >
+                          No results.
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
             </div>
 
             <div className="flex flex-col gap-4 py-4 px-2">
@@ -1524,7 +1489,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                             <PaginationLink 
                               onClick={() => table.setPageIndex(i)}
                               isActive={pageIndex === i}
-                              className={cn("h-9 w-9 font-medium", pageIndex === i && "bg-[#8370FC] text-white hover:bg-[#8370FC]/90")}
+                              className={cn("h-9 w-9 font-medium", pageIndex === i && "bg-[#4f9eb2] text-white hover:bg-[#4f9eb2]/90")}
                             >
                               {i + 1}
                             </PaginationLink>
@@ -1541,7 +1506,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                       ) {
                         return (
                           <PaginationItem key={i}>
-                            <PaginationEllipsis className="h-9" />
+                            <PaginationEllipsis className="h-9 text-[#4f9eb2]" />
                           </PaginationItem>
                         );
                       }
@@ -1570,7 +1535,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
 
             {/* Review Selected Dialog */}
             <Dialog open={showReviewSelected} onOpenChange={setShowReviewSelected}>
-              <DialogContent className="max-w-7xl max-h-[95vh] overflow-hidden flex flex-col bg-white">
+              <DialogContent className="max-w-5xl max-h-[95vh] overflow-hidden flex flex-col bg-white">
                 <DialogHeader>
                   <DialogTitle>Review Selected Records</DialogTitle>
                   <DialogDescription>
@@ -1584,11 +1549,11 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                       <TableRow className="border-none">
                         {table.getVisibleLeafColumns()
                           .filter(column => column.id !== "select" && column.getIsVisible())
-                          .slice(0, 6) // Only show first 6 columns in the review
+                          .slice(0, 6)
                           .map((column) => (
                             <TableHead 
                               key={column.id} 
-                              className="bg-[#8370FC]/20 hover:bg-[#8370FC]/30 px-4 py-3 text-sm font-medium text-gray-100 border-b border-[#8370FC]/25"
+                              className="bg-white px-6 py-4 text-sm font-medium text-gray-600 border-b border-gray-100"
                             >
                               {column.id.replace(/_/g, ' ')}
                             </TableHead>
@@ -1601,49 +1566,45 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                         return (
                           <TableRow 
                             key={i} 
-                            className="bg-white hover:bg-blue-50/30"
+                            className="bg-white hover:bg-gray-50/50 transition-all duration-200 hover:shadow-sm"
                           >
                             {table.getVisibleLeafColumns()
                               .filter(column => column.id !== "select" && column.getIsVisible())
-                              .slice(0, 6) // Only show first 6 columns
+                              .slice(0, 6)
                               .map(column => {
-                                // Get the data key from the column id
                                 const dataKey = column.id as keyof DataRow;
-                                // Get the value from the row data
                                 const value = rowData[dataKey];
-                                // Fix the styling for specific title column
                                 if (column.id === "Title") {
                                   return (
                                     <TableCell 
                                       key={column.id} 
-                                      className="px-4 py-2 text-sm border-b border-gray-100 text-gray-800"
+                                      className="px-6 py-4 text-sm border-b border-gray-100 text-gray-600"
                                     >
                                       <div 
-                                        className="px-2.5 py-1 rounded-md inline-block text-xs font-medium border bg-blue-50 text-blue-800 border-blue-200"
+                                        className="px-3 py-1.5 rounded-lg inline-block text-xs font-medium border bg-blue-50 text-blue-700 border-blue-100 shadow-sm"
                                       >
                                         {value}
                                       </div>
                                     </TableCell>
                                   );
                                 }
-                                // Improve the display for the review dialog
                                 return (
                                   <TableCell 
                                     key={column.id} 
-                                    className="px-4 py-2 text-sm border-b border-gray-100 text-gray-800"
+                                    className="px-6 py-4 text-sm border-b border-gray-100 text-gray-600"
                                   >
                                     {typeof value === 'string' ? (
                                       (column.id === "Industry" || column.id === "Country" || column.id === "Technologies") ? (
                                         <div 
-                                          className="px-2 py-0.5 rounded-md inline-block text-xs font-medium border bg-gray-50 text-gray-800 border-gray-200"
+                                          className="px-3 py-1.5 rounded-lg inline-block text-xs font-medium border bg-gray-50 text-gray-700 border-gray-100 shadow-sm"
                                         >
                                           {value}
                                         </div>
                                       ) : (
-                                        <span className="text-gray-800 font-medium">{value}</span>
+                                        <span className="text-gray-600 font-medium">{value}</span>
                                       )
                                     ) : (
-                                      <span className="text-gray-800">{String(value)}</span>
+                                      <span className="text-gray-600">{String(value)}</span>
                                     )}
                                   </TableCell>
                                 );
@@ -1655,7 +1616,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                         <TableRow>
                           <TableCell 
                             colSpan={6}
-                            className="px-4 py-2 text-center text-sm text-gray-500 italic"
+                            className="px-6 py-4 text-center text-sm text-gray-500 italic bg-gray-50/50"
                           >
                             ... and {table.getSelectedRowModel().rows.length - 50} more records
                           </TableCell>
@@ -1947,37 +1908,26 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                           const firstRow = userData?.dataFiles[selectedFileIndex]?.data[0];
                           const isWorkmateUser = firstRow && ('workmates_remark' in firstRow || 'tm_remarks' in firstRow);
                           
-                          // Define essential columns based on user type
+                          // Define essential columns based on user type - limited to 5 most important
                           const essentialColumns = isWorkmateUser ? [
-                            's_no',
-                            'account_name',
                             'contact_name',
+                            'account_name',
                             'designation',
-                            'email_id',
-                            'contact_number_personal',
                             'industry_client',
-                            'technologies',
-                            'revenue',
-                            'city',
-                            'state'
+                            'country_contact_person'
                           ] : [
                             'full_name',
-                            'title',
                             'company_name',
                             'email',
                             'personal_phone',
-                            'industry',
-                            'technologies'
+                            'industry'
                           ];
-                          
-                          const newVisibility: VisibilityState = {};
-                          
+                          const presetVisibility: VisibilityState = {};
                           // First hide all columns except select
                           table.getAllLeafColumns().forEach(column => {
-                            newVisibility[column.id] = column.id === 'select' || essentialColumns.includes(column.id);
+                            presetVisibility[column.id] = column.id === 'select' || essentialColumns.includes(column.id);
                           });
-                          
-                          table.setColumnVisibility(newVisibility);
+                          table.setColumnVisibility(presetVisibility);
                         }}
                       >
                         Essential Only
@@ -1987,13 +1937,13 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                         size="sm" 
                         className="h-7 text-xs border-gray-200 text-gray-700"
                         onClick={() => {
-                          const newVisibility: VisibilityState = {};
+                          const presetVisibility: VisibilityState = {};
                           table.getAllLeafColumns().forEach(column => {
                             if (column.id !== "select") {
-                              newVisibility[column.id] = true;
+                              presetVisibility[column.id] = true;
                             }
                           });
-                          table.setColumnVisibility(newVisibility);
+                          table.setColumnVisibility(presetVisibility);
                         }}
                       >
                         Show All
@@ -2003,13 +1953,13 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                         size="sm" 
                         className="h-7 text-xs border-gray-200 text-gray-700"
                         onClick={() => {
-                          const newVisibility: VisibilityState = {};
+                          const presetVisibility: VisibilityState = {};
                           table.getAllLeafColumns().forEach(column => {
                             if (column.id !== "select") {
-                              newVisibility[column.id] = false;
+                              presetVisibility[column.id] = false;
                             }
                           });
-                          table.setColumnVisibility(newVisibility);
+                          table.setColumnVisibility(presetVisibility);
                         }}
                       >
                         Hide All
@@ -2054,100 +2004,85 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
           </div>
         </div>
 
-        <div className="rounded-lg bg-white border border-gray-200 overflow-hidden">
-          <Table className="select-none w-full bg-white relative">
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow 
-                  key={headerGroup.id} 
-                  className="border-none select-none"
-                >
-                  {headerGroup.headers.map((header, index) => (
-                    <TableHead 
-                      key={header.id} 
-                      className={cn(
-                        "text-gray-100 font-medium bg-[#8370FC] px-4 py-3 first:rounded-tl-lg last:rounded-tr-lg border-b border-[#8370FC]/25 select-none text-sm",
-                        header.id === "select" && "w-[40px] pr-0",
-                        header.column.getIsPinned() && "sticky z-30 left-0 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]",
-                        header.column.getIsPinned() && index > 0 && "left-[40px]",
-                        header.column.getIsPinned() && index > 1 && "left-[calc(40px+200px)]",
-                        header.column.getIsPinned() && index > 2 && "left-[calc(40px+400px)]",
-                        !header.column.getIsPinned() && "relative z-10" // Lower z-index for unpinned columns
-                      )}
-                      style={{
-                        left: header.column.getIsPinned() && index > 0 ? 
-                          `${40 + (index - 1) * 180}px` : // Position pinned columns with proper spacing
-                          header.column.getIsPinned() ? 0 : undefined
-                      }}
-                    >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  ))}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody className="bg-white select-none">
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row, rowIndex) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                    className={cn(
-                      "hover:bg-[#8370FC]/5 cursor-pointer bg-white select-none transition-colors",
-                      row.getIsSelected() ? "bg-[#EAE7FF] border-[#8370FC]/30" : "bg-white",
-                      rowIndex === table.getRowModel().rows.length - 1 ? "last:border-b-0" : "border-b border-gray-100"
-                    )}
-                    onClick={() => {
-                      setSelectedRow(row.original)
-                      setIsRowDetailsOpen(true)
-                    }}
+        <div className="rounded-xl bg-white border border-gray-100 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+            <Table className="select-none w-full bg-white relative">
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow 
+                    key={headerGroup.id} 
+                    className="border-none select-none"
                   >
-                    {row.getVisibleCells().map((cell, cellIndex) => (
-                      <TableCell 
-                        key={cell.id} 
+                    {headerGroup.headers.map((header, index) => (
+                      <TableHead 
+                        key={header.id} 
                         className={cn(
-                          "text-gray-900 px-4 py-3 bg-white select-none text-sm",
-                          cell.column.id === "select" && "pr-0 pl-4 w-[40px]",
-                          row.getIsSelected() && "bg-[#EAE7FF]",
-                          rowIndex === table.getRowModel().rows.length - 1 && cellIndex === 0 && "rounded-bl-lg",
-                          rowIndex === table.getRowModel().rows.length - 1 && cellIndex === row.getVisibleCells().length - 1 && "rounded-br-lg",
-                          cell.column.getIsPinned() && "sticky z-20 left-0 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]",
-                          cell.column.getIsPinned() && cellIndex > 0 && "left-[40px]",
-                          cell.column.getIsPinned() && cellIndex > 1 && "left-[calc(40px+200px)]",
-                          cell.column.getIsPinned() && cellIndex > 2 && "left-[calc(40px+400px)]",
-                          !cell.column.getIsPinned() && "relative z-0" // Lower z-index for unpinned columns
+                          "text-gray-600 font-medium bg-white px-6 py-4 first:rounded-tl-xl last:rounded-tr-xl border-b border-gray-100 select-none text-sm transition-all duration-200",
+                          header.id === "select" && "w-[40px] pr-0",
+                          "relative z-10"
                         )}
-                        style={{ 
-                          userSelect: 'none', 
-                          WebkitUserSelect: 'none',
-                          left: cell.column.getIsPinned() && cellIndex > 0 ? 
-                            `${40 + (cellIndex - 1) * 180}px` : // Position pinned columns with proper spacing
-                            cell.column.getIsPinned() ? 0 : undefined
-                        }}
                       >
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
                     ))}
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-24 text-center text-gray-400 bg-white select-none rounded-b-lg"
-                  >
-                    No results.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
+                ))}
+              </TableHeader>
+              <TableBody className="bg-white select-none">
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row, rowIndex) => (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
+                      className={cn(
+                        "hover:bg-gray-50/50 cursor-pointer bg-white select-none transition-all duration-200",
+                        row.getIsSelected() ? "bg-[#EAE7FF] border-[#8370FC]/30" : "bg-white",
+                        rowIndex === table.getRowModel().rows.length - 1 ? "last:border-b-0" : "border-b border-gray-100",
+                        "hover:shadow-sm"
+                      )}
+                      onClick={() => {
+                        setSelectedRow(row.original)
+                        setIsRowDetailsOpen(true)
+                      }}
+                    >
+                      {row.getVisibleCells().map((cell, cellIndex) => (
+                        <TableCell 
+                          key={cell.id} 
+                          className={cn(
+                            "text-gray-600 px-6 py-4 bg-white select-none text-sm transition-all duration-200",
+                            cell.column.id === "select" && "pr-0 pl-6 w-[40px]",
+                            row.getIsSelected() && "bg-[#EAE7FF]",
+                            rowIndex === table.getRowModel().rows.length - 1 && cellIndex === 0 && "rounded-bl-xl",
+                            rowIndex === table.getRowModel().rows.length - 1 && cellIndex === row.getVisibleCells().length - 1 && "rounded-br-xl",
+                            "relative z-0"
+                          )}
+                          style={{ 
+                            userSelect: 'none', 
+                            WebkitUserSelect: 'none'
+                          }}
+                        >
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns.length}
+                      className="h-24 text-center text-gray-400 bg-white select-none rounded-b-xl"
+                    >
+                      No results.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
 
         <div className="flex flex-col gap-4 py-4 px-2">
           <div className="flex items-center justify-between">
@@ -2172,7 +2107,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                   ))}
                 </SelectContent>
               </Select>
-            </div>
+        </div>
 
             <Pagination>
               <PaginationContent className="gap-2">
@@ -2203,7 +2138,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                         <PaginationLink 
                           onClick={() => table.setPageIndex(i)}
                           isActive={pageIndex === i}
-                          className={cn("h-9 w-9 font-medium", pageIndex === i && "bg-[#8370FC] text-white hover:bg-[#8370FC]/90")}
+                          className={cn("h-9 w-9 font-medium", pageIndex === i && "bg-[#4f9eb2] text-white hover:bg-[#4f9eb2]/90")}
                         >
                           {i + 1}
                         </PaginationLink>
@@ -2220,7 +2155,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                   ) {
                     return (
                       <PaginationItem key={i}>
-                        <PaginationEllipsis className="h-9" />
+                        <PaginationEllipsis className="h-9 text-[#4f9eb2]" />
                       </PaginationItem>
                     );
                   }
@@ -2263,11 +2198,11 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                   <TableRow className="border-none">
                     {table.getVisibleLeafColumns()
                       .filter(column => column.id !== "select" && column.getIsVisible())
-                      .slice(0, 6) // Only show first 6 columns in the review
+                      .slice(0, 6)
                       .map((column) => (
                         <TableHead 
                           key={column.id} 
-                          className="bg-[#8370FC]/20 hover:bg-[#8370FC]/30 px-4 py-3 text-sm font-medium text-gray-100 border-b border-[#8370FC]/25"
+                          className="bg-white px-6 py-4 text-sm font-medium text-gray-600 border-b border-gray-100"
                         >
                           {column.id.replace(/_/g, ' ')}
                         </TableHead>
@@ -2280,49 +2215,45 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                     return (
                       <TableRow 
                         key={i} 
-                        className="bg-white hover:bg-blue-50/30"
+                        className="bg-white hover:bg-gray-50/50 transition-all duration-200 hover:shadow-sm"
                       >
                         {table.getVisibleLeafColumns()
                           .filter(column => column.id !== "select" && column.getIsVisible())
-                          .slice(0, 6) // Only show first 6 columns
+                          .slice(0, 6)
                           .map(column => {
-                            // Get the data key from the column id
                             const dataKey = column.id as keyof DataRow;
-                            // Get the value from the row data
                             const value = rowData[dataKey];
-                            // Fix the styling for specific title column
                             if (column.id === "Title") {
                               return (
                                 <TableCell 
                                   key={column.id} 
-                                  className="px-4 py-2 text-sm border-b border-gray-100 text-gray-800"
+                                  className="px-6 py-4 text-sm border-b border-gray-100 text-gray-600"
                                 >
                                   <div 
-                                    className="px-2.5 py-1 rounded-md inline-block text-xs font-medium border bg-blue-50 text-blue-800 border-blue-200"
+                                    className="px-3 py-1.5 rounded-lg inline-block text-xs font-medium border bg-blue-50 text-blue-700 border-blue-100 shadow-sm"
                                   >
                                     {value}
                                   </div>
                                 </TableCell>
                               );
                             }
-                            // Improve the display for the review dialog
                             return (
                               <TableCell 
                                 key={column.id} 
-                                className="px-4 py-2 text-sm border-b border-gray-100 text-gray-800"
+                                className="px-6 py-4 text-sm border-b border-gray-100 text-gray-600"
                               >
                                 {typeof value === 'string' ? (
                                   (column.id === "Industry" || column.id === "Country" || column.id === "Technologies") ? (
                                     <div 
-                                      className="px-2 py-0.5 rounded-md inline-block text-xs font-medium border bg-gray-50 text-gray-800 border-gray-200"
+                                      className="px-3 py-1.5 rounded-lg inline-block text-xs font-medium border bg-gray-50 text-gray-700 border-gray-100 shadow-sm"
                                     >
                                       {value}
                                     </div>
                                   ) : (
-                                    <span className="text-gray-800 font-medium">{value}</span>
+                                    <span className="text-gray-600 font-medium">{value}</span>
                                   )
                                 ) : (
-                                  <span className="text-gray-800">{String(value)}</span>
+                                  <span className="text-gray-600">{String(value)}</span>
                                 )}
                               </TableCell>
                             );
@@ -2334,7 +2265,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                     <TableRow>
                       <TableCell 
                         colSpan={6}
-                        className="px-4 py-2 text-center text-sm text-gray-500 italic"
+                        className="px-6 py-4 text-center text-sm text-gray-500 italic bg-gray-50/50"
                       >
                         ... and {table.getSelectedRowModel().rows.length - 50} more records
                       </TableCell>

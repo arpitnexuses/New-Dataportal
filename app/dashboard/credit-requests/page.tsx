@@ -24,6 +24,12 @@ interface CreditRequest {
   status: "pending" | "approved" | "rejected"
   createdAt: string
   updatedAt: string
+  companySize?: {
+    minEmployees?: number
+    maxEmployees?: number
+    minRevenue?: number
+    maxRevenue?: number
+  }
 }
 
 export default function CreditRequestsPage() {
@@ -178,6 +184,24 @@ export default function CreditRequestsPage() {
                     <p className="text-sm text-yellow-700 flex items-center gap-1">
                       <AlertCircle className="h-4 w-4" />
                       Request sent to admin
+                    </p>
+                  </div>
+                )}
+                {request.companySize && (
+                  <div className="mt-3 p-2 bg-blue-50 rounded-md border border-blue-100">
+                    <p className="text-sm text-blue-700 flex items-center gap-1">
+                      <p>
+                        {request.companySize?.minEmployees ?? "N/A"} - {request.companySize?.maxEmployees ?? "N/A"}
+                      </p>
+                    </p>
+                  </div>
+                )}
+                {request.companySize && (
+                  <div className="mt-3 p-2 bg-purple-50 rounded-md border border-purple-100">
+                    <p className="text-sm text-purple-700 flex items-center gap-1">
+                      <p>
+                        {request.companySize?.minRevenue ?? "N/A"} - {request.companySize?.maxRevenue ?? "N/A"}
+                      </p>
                     </p>
                   </div>
                 )}

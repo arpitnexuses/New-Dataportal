@@ -72,49 +72,49 @@ export function AnalyticsModal({ isOpen, onClose, data }: AnalyticsModalProps) {
         case 'title':
           return {
             title: 'Title Distribution',
-            icon: <Briefcase className="h-5 w-5 text-[#FF6B6B]" />,
+            icon: <Briefcase className="h-5 w-5 text-[#00B8A9]" />,
             data: analytics.title.topTitles,
-            color: '#FF6B6B',
+            color: '#00B8A9',
             type: 'bar'
           }
         case 'industry':
           return {
             title: 'Industry Distribution',
-            icon: <Building2 className="h-5 w-5 text-[#4ECDC4]" />,
+            icon: <Building2 className="h-5 w-5 text-[#F6416C]" />,
             data: analytics.industry.topIndustries,
-            color: '#4ECDC4',
+            color: '#F6416C',
             type: 'pie'
           }
         case 'technologies':
           return {
             title: 'Technologies Distribution',
-            icon: <Code className="h-5 w-5 text-[#45B7D1]" />,
+            icon: <Code className="h-5 w-5 text-[#FFDE7D]" />,
             data: analytics.technologies.allTechnologies,
-            color: '#45B7D1',
+            color: '#FFDE7D',
             type: 'bar'
           }
         case 'employee':
           return {
             title: 'Employee Size Distribution',
-            icon: <Users className="h-5 w-5 text-[#96CEB4]" />,
+            icon: <Users className="h-5 w-5 text-[#B8F2E6]" />,
             data: analytics.employeeSize.ranges,
-            color: '#96CEB4',
+            color: '#B8F2E6',
             type: 'bar'
           }
         case 'revenue':
           return {
             title: 'Revenue Range Distribution',
-            icon: <DollarSign className="h-5 w-5 text-[#FF8C42]" />,
+            icon: <DollarSign className="h-5 w-5 text-[#F6416C]" />,
             data: analytics.annualRevenue.ranges,
-            color: '#FF8C42',
+            color: '#F6416C',
             type: 'bar'
           }
         case 'country':
           return {
             title: 'Top Countries',
-            icon: <Globe className="h-5 w-5 text-[#9B59B6]" />,
+            icon: <Globe className="h-5 w-5 text-[#00B8A9]" />,
             data: analytics.country.topCountries,
-            color: '#9B59B6',
+            color: '#00B8A9',
             type: 'pie'
           }
         default:
@@ -448,7 +448,7 @@ export function AnalyticsModal({ isOpen, onClose, data }: AnalyticsModalProps) {
                 <Card className="bg-white border border-gray-200 hover:border-gray-300 transition-all duration-300 h-[400px] shadow-sm hover:shadow-md">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <div className="flex items-center gap-2">
-                      <Briefcase className="h-5 w-5 text-[#FF6B6B]" />
+                      <Briefcase className="h-5 w-5 text-[#00B8A9]" />
                       <CardTitle className="text-lg font-semibold text-gray-800">Title Distribution</CardTitle>
                     </div>
                   </CardHeader>
@@ -457,7 +457,7 @@ export function AnalyticsModal({ isOpen, onClose, data }: AnalyticsModalProps) {
                       <ChartContainer
                         config={{
                           value: {
-                            color: "#FF6B6B",
+                            color: "#00B8A9",
                             label: "Title Distribution"
                           }
                         }}
@@ -489,7 +489,7 @@ export function AnalyticsModal({ isOpen, onClose, data }: AnalyticsModalProps) {
                             />
                             <Bar 
                               dataKey="value" 
-                              fill="#FF6B6B"
+                              fill="#00B8A9"
                               radius={[6, 6, 0, 0]}
                               isAnimationActive={false}
                               maxBarSize={60}
@@ -518,7 +518,7 @@ export function AnalyticsModal({ isOpen, onClose, data }: AnalyticsModalProps) {
                 <Card className="bg-white border border-gray-200 hover:border-gray-300 transition-all duration-300 h-[400px] shadow-sm hover:shadow-md">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <div className="flex items-center gap-2">
-                      <Building2 className="h-5 w-5 text-[#4ECDC4]" />
+                      <Building2 className="h-5 w-5 text-[#F6416C]" />
                       <CardTitle className="text-lg font-semibold text-gray-800">Industry Distribution</CardTitle>
                     </div>
                   </CardHeader>
@@ -527,7 +527,7 @@ export function AnalyticsModal({ isOpen, onClose, data }: AnalyticsModalProps) {
                       <ChartContainer
                         config={{
                           value: {
-                            color: "#4ECDC4",
+                            color: "#F6416C",
                             label: "Industry Distribution"
                           }
                         }}
@@ -581,7 +581,7 @@ export function AnalyticsModal({ isOpen, onClose, data }: AnalyticsModalProps) {
                 <Card className="bg-white border border-gray-200 hover:border-gray-300 transition-all duration-300 h-[400px] shadow-sm hover:shadow-md">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <div className="flex items-center gap-2">
-                      <Code className="h-5 w-5 text-[#45B7D1]" />
+                      <Code className="h-5 w-5 text-[#FFDE7D]" />
                       <CardTitle className="text-lg font-semibold text-gray-800">Technologies Distribution</CardTitle>
                     </div>
                   </CardHeader>
@@ -590,7 +590,7 @@ export function AnalyticsModal({ isOpen, onClose, data }: AnalyticsModalProps) {
                       <ChartContainer
                         config={{
                           value: {
-                            color: "#45B7D1",
+                            color: "#FFDE7D",
                             label: "Technologies Distribution"
                           }
                         }}
@@ -610,7 +610,7 @@ export function AnalyticsModal({ isOpen, onClose, data }: AnalyticsModalProps) {
                             <ChartTooltip content={<CustomTooltip />} />
                             <Bar 
                               dataKey="value" 
-                              fill="#45B7D1"
+                              fill="#FFDE7D"
                               radius={[6, 6, 0, 0]}
                               isAnimationActive={false}
                             />
@@ -634,7 +634,7 @@ export function AnalyticsModal({ isOpen, onClose, data }: AnalyticsModalProps) {
                 <Card className="bg-white border border-gray-200 hover:border-gray-300 transition-all duration-300 h-[400px] shadow-sm hover:shadow-md">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <div className="flex items-center gap-2">
-                      <Users className="h-5 w-5 text-[#96CEB4]" />
+                      <Users className="h-5 w-5 text-[#B8F2E6]" />
                       <CardTitle className="text-lg font-semibold text-gray-800">Employee Size Distribution</CardTitle>
                     </div>
                   </CardHeader>
@@ -643,7 +643,7 @@ export function AnalyticsModal({ isOpen, onClose, data }: AnalyticsModalProps) {
                       <ChartContainer
                         config={{
                           value: {
-                            color: "#96CEB4",
+                            color: "#B8F2E6",
                             label: "Employee Size Distribution"
                           }
                         }}
@@ -675,7 +675,7 @@ export function AnalyticsModal({ isOpen, onClose, data }: AnalyticsModalProps) {
                             />
                             <Bar 
                               dataKey="value" 
-                              fill="#96CEB4"
+                              fill="#B8F2E6"
                               radius={[6, 6, 0, 0]}
                               isAnimationActive={false}
                               maxBarSize={60}
@@ -700,7 +700,7 @@ export function AnalyticsModal({ isOpen, onClose, data }: AnalyticsModalProps) {
                 <Card className="bg-white border border-gray-200 hover:border-gray-300 transition-all duration-300 h-[400px] shadow-sm hover:shadow-md">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <div className="flex items-center gap-2">
-                      <DollarSign className="h-5 w-5 text-[#FF8C42]" />
+                      <DollarSign className="h-5 w-5 text-[#F6416C]" />
                       <CardTitle className="text-lg font-semibold text-gray-800">Revenue Range Distribution</CardTitle>
                     </div>
                   </CardHeader>
@@ -709,7 +709,7 @@ export function AnalyticsModal({ isOpen, onClose, data }: AnalyticsModalProps) {
                       <ChartContainer
                         config={{
                           value: {
-                            color: "#FF8C42",
+                            color: "#F6416C",
                             label: "Revenue Range Distribution"
                           }
                         }}
@@ -744,7 +744,7 @@ export function AnalyticsModal({ isOpen, onClose, data }: AnalyticsModalProps) {
                             />
                             <Bar 
                               dataKey="value" 
-                              fill="#FF8C42"
+                              fill="#F6416C"
                               radius={[6, 6, 0, 0]}
                               isAnimationActive={false}
                               maxBarSize={60}
@@ -769,7 +769,7 @@ export function AnalyticsModal({ isOpen, onClose, data }: AnalyticsModalProps) {
                 <Card className="bg-white border border-gray-200 hover:border-gray-300 transition-all duration-300 h-[400px] shadow-sm hover:shadow-md">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <div className="flex items-center gap-2">
-                      <Globe className="h-5 w-5 text-[#9B59B6]" />
+                      <Globe className="h-5 w-5 text-[#00B8A9]" />
                       <CardTitle className="text-lg font-semibold text-gray-800">Top Countries</CardTitle>
                     </div>
                   </CardHeader>
@@ -778,7 +778,7 @@ export function AnalyticsModal({ isOpen, onClose, data }: AnalyticsModalProps) {
                       <ChartContainer
                         config={{
                           value: {
-                            color: "#9B59B6",
+                            color: "#00B8A9",
                             label: "Top Countries"
                           }
                         }}

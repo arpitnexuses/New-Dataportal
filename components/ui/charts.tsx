@@ -10,4 +10,6 @@ export {
   Legend,
   Tooltip,
   CartesianGrid,
+  RadialBarChart,
+  RadialBar
 } from "recharts" 
