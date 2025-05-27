@@ -66,6 +66,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import * as React from "react"
 
 declare module '@tanstack/table-core' {
   interface FilterFns {
@@ -392,6 +393,16 @@ const preventSelection = (e: Event) => {
   e.preventDefault();
   return false;
 };
+
+// Now create a custom table component that doesn't have the built-in overflow
+function CustomTable({ className, ...props }: React.HTMLAttributes<HTMLTableElement>) {
+  return (
+    <table
+      className={cn("w-full caption-bottom text-sm", className)}
+      {...props}
+    />
+  );
+}
 
 export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, allFilesData }: DataTableProps) {
   const [userData, setUserData] = useState<UserData | null>(null)
@@ -1185,10 +1196,11 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
         data: allFilesData
       }
       return (
-        <Card className="border-none shadow-none w-full bg-white text-black">
+        <Card className="border-none shadow-none w-full bg-white text-black" style={{ maxWidth: '100%' }}>
           <CardContent 
             className="p-1 select-none" 
             onContextMenu={preventContextMenu}
+            style={{ maxWidth: '100%', overflowX: 'hidden' }}
           >
             {/* Logo and Header */}
             <div className="flex flex-col mb-1 w-full">
@@ -1355,86 +1367,108 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
               </div>
             </div>
 
-            <div className="rounded-xl bg-white border border-gray-100 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-                <Table className="select-none w-full bg-white relative">
-                  <TableHeader>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                      <TableRow 
-                        key={headerGroup.id} 
-                        className="border-none select-none"
-                      >
-                        {headerGroup.headers.map((header, index) => (
-                          <TableHead 
-                            key={header.id} 
-                            className={cn(
-                              "text-gray-600 font-medium bg-white px-6 py-4 first:rounded-tl-xl last:rounded-tr-xl border-b border-gray-100 select-none text-sm transition-all duration-200",
-                              header.id === "select" && "w-[40px] pr-0",
-                              "relative z-10"
-                            )}
-                          >
-                            {header.isPlaceholder
-                              ? null
-                              : flexRender(
-                                  header.column.columnDef.header,
-                                  header.getContext()
-                                )}
-                          </TableHead>
-                        ))}
-                      </TableRow>
-                    ))}
-                  </TableHeader>
-                  <TableBody className="bg-white select-none">
-                    {table.getRowModel().rows?.length ? (
-                      table.getRowModel().rows.map((row, rowIndex) => (
-                        <TableRow
-                          key={row.id}
-                          data-state={row.getIsSelected() && "selected"}
-                          className={cn(
-                            "hover:bg-gray-50/50 cursor-pointer bg-white select-none transition-all duration-200",
-                            row.getIsSelected() ? "bg-[#EAE7FF] border-[#8370FC]/30" : "bg-white",
-                            rowIndex === table.getRowModel().rows.length - 1 ? "last:border-b-0" : "border-b border-gray-100",
-                            "hover:shadow-sm"
-                          )}
-                          onClick={() => {
-                            setSelectedRow(row.original)
-                            setIsRowDetailsOpen(true)
-                          }}
+            {/* Main Table - Fixed overflow container structure */}
+            <div className="overflow-hidden rounded-xl border border-gray-100 shadow-sm w-full">
+              <div className="overflow-x-auto">
+                <div style={{ width: 'fit-content', minWidth: '100%', maxWidth: 'max-content' }}>
+                  <Table className="select-none bg-white w-full" style={{ tableLayout: 'auto' }}>
+                    <TableHeader>
+                      {table.getHeaderGroups().map((headerGroup) => (
+                        <TableRow 
+                          key={headerGroup.id} 
+                          className="border-none select-none"
                         >
-                          {row.getVisibleCells().map((cell, cellIndex) => (
-                            <TableCell 
-                              key={cell.id} 
+                          {headerGroup.headers.map((header, index) => (
+                            <TableHead 
+                              key={header.id} 
                               className={cn(
-                                "text-gray-600 px-6 py-4 bg-white select-none text-sm transition-all duration-200",
-                                cell.column.id === "select" && "pr-0 pl-6 w-[40px]",
-                                row.getIsSelected() && "bg-[#EAE7FF]",
-                                rowIndex === table.getRowModel().rows.length - 1 && cellIndex === 0 && "rounded-bl-xl",
-                                rowIndex === table.getRowModel().rows.length - 1 && cellIndex === row.getVisibleCells().length - 1 && "rounded-br-xl",
-                                "relative z-0"
+                                "text-gray-600 font-medium bg-white px-6 py-4 first:rounded-tl-xl last:rounded-tr-xl border-b border-gray-100 select-none text-sm transition-all duration-200",
+                                header.id === "select" && "w-[40px] pr-0",
+                                "relative z-10"
                               )}
                               style={{ 
-                                userSelect: 'none', 
-                                WebkitUserSelect: 'none'
+                                width: header.id === "select" ? "40px" : 
+                                      header.id === "Technologies" ? "200px" : 
+                                      header.id === "Industry" || header.id === "Country" ? "120px" : 
+                                      header.id === "email" || header.id === "website" ? "180px" : "150px",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap"
                               }}
                             >
-                              {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                            </TableCell>
+                              {header.isPlaceholder
+                                ? null
+                                : flexRender(
+                                    header.column.columnDef.header,
+                                    header.getContext()
+                                  )}
+                            </TableHead>
                           ))}
                         </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell
-                          colSpan={columns.length}
-                          className="h-24 text-center text-gray-400 bg-white select-none rounded-b-xl"
-                        >
-                          No results.
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
+                      ))}
+                    </TableHeader>
+                    <TableBody className="bg-white select-none">
+                      {table.getRowModel().rows?.length ? (
+                        table.getRowModel().rows.map((row, rowIndex) => (
+                          <TableRow
+                            key={row.id}
+                            data-state={row.getIsSelected() && "selected"}
+                            className={cn(
+                              "hover:bg-gray-50/50 cursor-pointer bg-white select-none transition-all duration-200",
+                              row.getIsSelected() ? "bg-[#EAE7FF] border-[#8370FC]/30" : "bg-white",
+                              rowIndex === table.getRowModel().rows.length - 1 ? "last:border-b-0" : "border-b border-gray-100",
+                              "hover:shadow-sm"
+                            )}
+                            onClick={() => {
+                              setSelectedRow(row.original)
+                              setIsRowDetailsOpen(true)
+                            }}
+                          >
+                            {row.getVisibleCells().map((cell, cellIndex) => (
+                              <TableCell 
+                                key={cell.id} 
+                                className={cn(
+                                  "text-gray-600 px-6 py-4 bg-white select-none text-sm transition-all duration-200",
+                                  cell.column.id === "select" && "pr-0 pl-6 w-[40px]",
+                                  row.getIsSelected() && "bg-[#EAE7FF]",
+                                  rowIndex === table.getRowModel().rows.length - 1 && cellIndex === 0 && "rounded-bl-xl",
+                                  rowIndex === table.getRowModel().rows.length - 1 && cellIndex === row.getVisibleCells().length - 1 && "rounded-br-xl",
+                                  "relative z-0 overflow-hidden"
+                                )}
+                                style={{ 
+                                  userSelect: 'none', 
+                                  WebkitUserSelect: 'none',
+                                  width: cell.column.id === "select" ? "40px" : 
+                                        cell.column.id === "Technologies" ? "200px" : 
+                                        cell.column.id === "Industry" || cell.column.id === "Country" ? "120px" : 
+                                        cell.column.id === "email" || cell.column.id === "website" ? "180px" : "150px",
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                  whiteSpace: "nowrap"
+                                }}
+                              >
+                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                        ))
+                      ) : (
+                        <TableRow>
+                          <TableCell
+                            colSpan={columns.length}
+                            className="h-24 text-center text-gray-400 bg-white select-none rounded-b-xl"
+                          >
+                            No results.
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
             </div>
 
+            {/* Pagination */}
             <div className="flex flex-col gap-4 py-4 px-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
@@ -1543,87 +1577,90 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                   </DialogDescription>
                 </DialogHeader>
                 
-                <div className="overflow-y-auto flex-grow mt-4 pr-2">
-                  <Table className="w-full">
-                    <TableHeader>
-                      <TableRow className="border-none">
-                        {table.getVisibleLeafColumns()
-                          .filter(column => column.id !== "select" && column.getIsVisible())
-                          .slice(0, 6)
-                          .map((column) => (
-                            <TableHead 
-                              key={column.id} 
-                              className="bg-white px-6 py-4 text-sm font-medium text-gray-600 border-b border-gray-100"
+                <div className="overflow-auto flex-grow mt-4 pr-2">
+                  <div style={{ width: 'fit-content', minWidth: '100%' }}>
+                    <Table className="w-full">
+                      <TableHeader>
+                        <TableRow className="border-none">
+                          {table.getVisibleLeafColumns()
+                            .filter(column => column.id !== "select" && column.getIsVisible())
+                            .slice(0, 6)
+                            .map((column) => (
+                              <TableHead 
+                                key={column.id} 
+                                className="bg-white px-6 py-4 text-sm font-medium text-gray-600 border-b border-gray-100"
+                                style={{ minWidth: "180px" }}
+                              >
+                                {column.id.replace(/_/g, ' ')}
+                              </TableHead>
+                            ))}
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {table.getSelectedRowModel().rows.slice(0, 50).map((row: any, i: number) => {
+                          const rowData = row.original;
+                          return (
+                            <TableRow 
+                              key={i} 
+                              className="bg-white hover:bg-gray-50/50 transition-all duration-200 hover:shadow-sm"
                             >
-                              {column.id.replace(/_/g, ' ')}
-                            </TableHead>
-                          ))}
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {table.getSelectedRowModel().rows.slice(0, 50).map((row: any, i: number) => {
-                        const rowData = row.original;
-                        return (
-                          <TableRow 
-                            key={i} 
-                            className="bg-white hover:bg-gray-50/50 transition-all duration-200 hover:shadow-sm"
-                          >
-                            {table.getVisibleLeafColumns()
-                              .filter(column => column.id !== "select" && column.getIsVisible())
-                              .slice(0, 6)
-                              .map(column => {
-                                const dataKey = column.id as keyof DataRow;
-                                const value = rowData[dataKey];
-                                if (column.id === "Title") {
+                              {table.getVisibleLeafColumns()
+                                .filter(column => column.id !== "select" && column.getIsVisible())
+                                .slice(0, 6)
+                                .map(column => {
+                                  const dataKey = column.id as keyof DataRow;
+                                  const value = rowData[dataKey];
+                                  if (column.id === "Title") {
+                                    return (
+                                      <TableCell 
+                                        key={column.id} 
+                                        className="px-6 py-4 text-sm border-b border-gray-100 text-gray-600"
+                                      >
+                                        <div 
+                                          className="px-3 py-1.5 rounded-lg inline-block text-xs font-medium border bg-blue-50 text-blue-700 border-blue-100 shadow-sm"
+                                        >
+                                          {value}
+                                        </div>
+                                      </TableCell>
+                                    );
+                                  }
                                   return (
                                     <TableCell 
                                       key={column.id} 
                                       className="px-6 py-4 text-sm border-b border-gray-100 text-gray-600"
                                     >
-                                      <div 
-                                        className="px-3 py-1.5 rounded-lg inline-block text-xs font-medium border bg-blue-50 text-blue-700 border-blue-100 shadow-sm"
-                                      >
-                                        {value}
-                                      </div>
+                                      {typeof value === 'string' ? (
+                                        (column.id === "Industry" || column.id === "Country" || column.id === "Technologies") ? (
+                                          <div 
+                                            className="px-3 py-1.5 rounded-lg inline-block text-xs font-medium border bg-gray-50 text-gray-700 border-gray-100 shadow-sm"
+                                          >
+                                            {value}
+                                          </div>
+                                        ) : (
+                                          <span className="text-gray-600 font-medium">{value}</span>
+                                        )
+                                      ) : (
+                                        <span className="text-gray-600">{String(value)}</span>
+                                      )}
                                     </TableCell>
                                   );
-                                }
-                                return (
-                                  <TableCell 
-                                    key={column.id} 
-                                    className="px-6 py-4 text-sm border-b border-gray-100 text-gray-600"
-                                  >
-                                    {typeof value === 'string' ? (
-                                      (column.id === "Industry" || column.id === "Country" || column.id === "Technologies") ? (
-                                        <div 
-                                          className="px-3 py-1.5 rounded-lg inline-block text-xs font-medium border bg-gray-50 text-gray-700 border-gray-100 shadow-sm"
-                                        >
-                                          {value}
-                                        </div>
-                                      ) : (
-                                        <span className="text-gray-600 font-medium">{value}</span>
-                                      )
-                                    ) : (
-                                      <span className="text-gray-600">{String(value)}</span>
-                                    )}
-                                  </TableCell>
-                                );
-                              })}
+                                })}
+                            </TableRow>
+                          );
+                        })}
+                        {table.getSelectedRowModel().rows.length > 50 && (
+                          <TableRow>
+                            <TableCell 
+                              colSpan={6}
+                              className="px-6 py-4 text-center text-sm text-gray-500 italic bg-gray-50/50"
+                            >
+                              ... and {table.getSelectedRowModel().rows.length - 50} more records
+                            </TableCell>
                           </TableRow>
-                        );
-                      })}
-                      {table.getSelectedRowModel().rows.length > 50 && (
-                        <TableRow>
-                          <TableCell 
-                            colSpan={6}
-                            className="px-6 py-4 text-center text-sm text-gray-500 italic bg-gray-50/50"
-                          >
-                            ... and {table.getSelectedRowModel().rows.length - 50} more records
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
                 </div>
                 
                 <div className="pt-4 border-t mt-4">
@@ -1744,6 +1781,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
               </DialogContent>
             </Dialog>
 
+            {/* No Selection Warning Dialog */}
             <Dialog open={showNoSelectionWarning} onOpenChange={setShowNoSelectionWarning}>
               <DialogContent>
                 <DialogHeader>
@@ -1841,10 +1879,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
       >
         {/* Logo and Header */}
         <div className="flex flex-col mb-1 w-full">
-          
-          
-          
-          
+          {/* Empty header area */}
         </div>
 
         {/* Filters Section */}
@@ -2004,86 +2039,108 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
           </div>
         </div>
 
-        <div className="rounded-xl bg-white border border-gray-100 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-            <Table className="select-none w-full bg-white relative">
-              <TableHeader>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow 
-                    key={headerGroup.id} 
-                    className="border-none select-none"
-                  >
-                    {headerGroup.headers.map((header, index) => (
-                      <TableHead 
-                        key={header.id} 
-                        className={cn(
-                          "text-gray-600 font-medium bg-white px-6 py-4 first:rounded-tl-xl last:rounded-tr-xl border-b border-gray-100 select-none text-sm transition-all duration-200",
-                          header.id === "select" && "w-[40px] pr-0",
-                          "relative z-10"
-                        )}
-                      >
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                      </TableHead>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody className="bg-white select-none">
-                {table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row, rowIndex) => (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() && "selected"}
-                      className={cn(
-                        "hover:bg-gray-50/50 cursor-pointer bg-white select-none transition-all duration-200",
-                        row.getIsSelected() ? "bg-[#EAE7FF] border-[#8370FC]/30" : "bg-white",
-                        rowIndex === table.getRowModel().rows.length - 1 ? "last:border-b-0" : "border-b border-gray-100",
-                        "hover:shadow-sm"
-                      )}
-                      onClick={() => {
-                        setSelectedRow(row.original)
-                        setIsRowDetailsOpen(true)
-                      }}
+        {/* Main Table - Fixed overflow container structure */}
+        <div className="overflow-hidden rounded-xl border border-gray-100 shadow-sm w-full">
+          <div className="overflow-x-auto">
+            <div style={{ width: 'fit-content', minWidth: '100%', maxWidth: 'max-content' }}>
+              <Table className="select-none bg-white w-full" style={{ tableLayout: 'auto' }}>
+                <TableHeader>
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow 
+                      key={headerGroup.id} 
+                      className="border-none select-none"
                     >
-                      {row.getVisibleCells().map((cell, cellIndex) => (
-                        <TableCell 
-                          key={cell.id} 
+                      {headerGroup.headers.map((header, index) => (
+                        <TableHead 
+                          key={header.id} 
                           className={cn(
-                            "text-gray-600 px-6 py-4 bg-white select-none text-sm transition-all duration-200",
-                            cell.column.id === "select" && "pr-0 pl-6 w-[40px]",
-                            row.getIsSelected() && "bg-[#EAE7FF]",
-                            rowIndex === table.getRowModel().rows.length - 1 && cellIndex === 0 && "rounded-bl-xl",
-                            rowIndex === table.getRowModel().rows.length - 1 && cellIndex === row.getVisibleCells().length - 1 && "rounded-br-xl",
-                            "relative z-0"
+                            "text-gray-600 font-medium bg-white px-6 py-4 first:rounded-tl-xl last:rounded-tr-xl border-b border-gray-100 select-none text-sm transition-all duration-200",
+                            header.id === "select" && "w-[40px] pr-0",
+                            "relative z-10"
                           )}
                           style={{ 
-                            userSelect: 'none', 
-                            WebkitUserSelect: 'none'
+                            width: header.id === "select" ? "40px" : 
+                                  header.id === "Technologies" ? "200px" : 
+                                  header.id === "Industry" || header.id === "Country" ? "120px" : 
+                                  header.id === "email" || header.id === "website" ? "180px" : "150px",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap"
                           }}
                         >
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </TableCell>
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                        </TableHead>
                       ))}
                     </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center text-gray-400 bg-white select-none rounded-b-xl"
-                    >
-                      No results.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                  ))}
+                </TableHeader>
+                <TableBody className="bg-white select-none">
+                  {table.getRowModel().rows?.length ? (
+                    table.getRowModel().rows.map((row, rowIndex) => (
+                      <TableRow
+                        key={row.id}
+                        data-state={row.getIsSelected() && "selected"}
+                        className={cn(
+                          "hover:bg-gray-50/50 cursor-pointer bg-white select-none transition-all duration-200",
+                          row.getIsSelected() ? "bg-[#EAE7FF] border-[#8370FC]/30" : "bg-white",
+                          rowIndex === table.getRowModel().rows.length - 1 ? "last:border-b-0" : "border-b border-gray-100",
+                          "hover:shadow-sm"
+                        )}
+                        onClick={() => {
+                          setSelectedRow(row.original)
+                          setIsRowDetailsOpen(true)
+                        }}
+                      >
+                        {row.getVisibleCells().map((cell, cellIndex) => (
+                          <TableCell 
+                            key={cell.id} 
+                            className={cn(
+                              "text-gray-600 px-6 py-4 bg-white select-none text-sm transition-all duration-200",
+                              cell.column.id === "select" && "pr-0 pl-6 w-[40px]",
+                              row.getIsSelected() && "bg-[#EAE7FF]",
+                              rowIndex === table.getRowModel().rows.length - 1 && cellIndex === 0 && "rounded-bl-xl",
+                              rowIndex === table.getRowModel().rows.length - 1 && cellIndex === row.getVisibleCells().length - 1 && "rounded-br-xl",
+                              "relative z-0 overflow-hidden"
+                            )}
+                            style={{ 
+                              userSelect: 'none', 
+                              WebkitUserSelect: 'none',
+                              width: cell.column.id === "select" ? "40px" : 
+                                    cell.column.id === "Technologies" ? "200px" : 
+                                    cell.column.id === "Industry" || cell.column.id === "Country" ? "120px" : 
+                                    cell.column.id === "email" || cell.column.id === "website" ? "180px" : "150px",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              whiteSpace: "nowrap"
+                            }}
+                          >
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell
+                        colSpan={columns.length}
+                        className="h-24 text-center text-gray-400 bg-white select-none rounded-b-xl"
+                      >
+                        No results.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </div>
+        </div>
 
+        {/* Pagination */}
         <div className="flex flex-col gap-4 py-4 px-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -2107,7 +2164,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                   ))}
                 </SelectContent>
               </Select>
-        </div>
+            </div>
 
             <Pagination>
               <PaginationContent className="gap-2">
@@ -2192,87 +2249,90 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
               </DialogDescription>
             </DialogHeader>
             
-            <div className="overflow-y-auto flex-grow mt-4 pr-2">
-              <Table className="w-full">
-                <TableHeader>
-                  <TableRow className="border-none">
-                    {table.getVisibleLeafColumns()
-                      .filter(column => column.id !== "select" && column.getIsVisible())
-                      .slice(0, 6)
-                      .map((column) => (
-                        <TableHead 
-                          key={column.id} 
-                          className="bg-white px-6 py-4 text-sm font-medium text-gray-600 border-b border-gray-100"
+            <div className="overflow-auto flex-grow mt-4 pr-2">
+              <div style={{ width: 'fit-content', minWidth: '100%' }}>
+                <Table className="w-full">
+                  <TableHeader>
+                    <TableRow className="border-none">
+                      {table.getVisibleLeafColumns()
+                        .filter(column => column.id !== "select" && column.getIsVisible())
+                        .slice(0, 6)
+                        .map((column) => (
+                          <TableHead 
+                            key={column.id} 
+                            className="bg-white px-6 py-4 text-sm font-medium text-gray-600 border-b border-gray-100"
+                            style={{ minWidth: "180px" }}
+                          >
+                            {column.id.replace(/_/g, ' ')}
+                          </TableHead>
+                        ))}
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {table.getSelectedRowModel().rows.slice(0, 50).map((row: any, i: number) => {
+                      const rowData = row.original;
+                      return (
+                        <TableRow 
+                          key={i} 
+                          className="bg-white hover:bg-gray-50/50 transition-all duration-200 hover:shadow-sm"
                         >
-                          {column.id.replace(/_/g, ' ')}
-                        </TableHead>
-                      ))}
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {table.getSelectedRowModel().rows.slice(0, 50).map((row: any, i: number) => {
-                    const rowData = row.original;
-                    return (
-                      <TableRow 
-                        key={i} 
-                        className="bg-white hover:bg-gray-50/50 transition-all duration-200 hover:shadow-sm"
-                      >
-                        {table.getVisibleLeafColumns()
-                          .filter(column => column.id !== "select" && column.getIsVisible())
-                          .slice(0, 6)
-                          .map(column => {
-                            const dataKey = column.id as keyof DataRow;
-                            const value = rowData[dataKey];
-                            if (column.id === "Title") {
+                          {table.getVisibleLeafColumns()
+                            .filter(column => column.id !== "select" && column.getIsVisible())
+                            .slice(0, 6)
+                            .map(column => {
+                              const dataKey = column.id as keyof DataRow;
+                              const value = rowData[dataKey];
+                              if (column.id === "Title") {
+                                return (
+                                  <TableCell 
+                                    key={column.id} 
+                                    className="px-6 py-4 text-sm border-b border-gray-100 text-gray-600"
+                                  >
+                                    <div 
+                                      className="px-3 py-1.5 rounded-lg inline-block text-xs font-medium border bg-blue-50 text-blue-700 border-blue-100 shadow-sm"
+                                    >
+                                      {value}
+                                    </div>
+                                  </TableCell>
+                                );
+                              }
                               return (
                                 <TableCell 
                                   key={column.id} 
                                   className="px-6 py-4 text-sm border-b border-gray-100 text-gray-600"
                                 >
-                                  <div 
-                                    className="px-3 py-1.5 rounded-lg inline-block text-xs font-medium border bg-blue-50 text-blue-700 border-blue-100 shadow-sm"
-                                  >
-                                    {value}
-                                  </div>
+                                  {typeof value === 'string' ? (
+                                    (column.id === "Industry" || column.id === "Country" || column.id === "Technologies") ? (
+                                      <div 
+                                        className="px-3 py-1.5 rounded-lg inline-block text-xs font-medium border bg-gray-50 text-gray-700 border-gray-100 shadow-sm"
+                                      >
+                                        {value}
+                                      </div>
+                                    ) : (
+                                      <span className="text-gray-600 font-medium">{value}</span>
+                                    )
+                                  ) : (
+                                    <span className="text-gray-600">{String(value)}</span>
+                                  )}
                                 </TableCell>
                               );
-                            }
-                            return (
-                              <TableCell 
-                                key={column.id} 
-                                className="px-6 py-4 text-sm border-b border-gray-100 text-gray-600"
-                              >
-                                {typeof value === 'string' ? (
-                                  (column.id === "Industry" || column.id === "Country" || column.id === "Technologies") ? (
-                                    <div 
-                                      className="px-3 py-1.5 rounded-lg inline-block text-xs font-medium border bg-gray-50 text-gray-700 border-gray-100 shadow-sm"
-                                    >
-                                      {value}
-                                    </div>
-                                  ) : (
-                                    <span className="text-gray-600 font-medium">{value}</span>
-                                  )
-                                ) : (
-                                  <span className="text-gray-600">{String(value)}</span>
-                                )}
-                              </TableCell>
-                            );
-                          })}
+                            })}
+                        </TableRow>
+                      );
+                    })}
+                    {table.getSelectedRowModel().rows.length > 50 && (
+                      <TableRow>
+                        <TableCell 
+                          colSpan={6}
+                          className="px-6 py-4 text-center text-sm text-gray-500 italic bg-gray-50/50"
+                        >
+                          ... and {table.getSelectedRowModel().rows.length - 50} more records
+                        </TableCell>
                       </TableRow>
-                    );
-                  })}
-                  {table.getSelectedRowModel().rows.length > 50 && (
-                    <TableRow>
-                      <TableCell 
-                        colSpan={6}
-                        className="px-6 py-4 text-center text-sm text-gray-500 italic bg-gray-50/50"
-                      >
-                        ... and {table.getSelectedRowModel().rows.length - 50} more records
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
             
             <div className="pt-4 border-t mt-4">
@@ -2393,6 +2453,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
           </DialogContent>
         </Dialog>
 
+        {/* No Selection Warning Dialog */}
         <Dialog open={showNoSelectionWarning} onOpenChange={setShowNoSelectionWarning}>
           <DialogContent>
             <DialogHeader>

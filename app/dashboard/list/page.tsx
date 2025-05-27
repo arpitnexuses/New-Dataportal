@@ -71,7 +71,7 @@ export default function ListPage() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 overflow-hidden max-w-full">
       {!selectedFile ? (
         <>
           <h1 className="text-3xl font-bold text-gray-800">Files</h1>
@@ -156,7 +156,7 @@ export default function ListPage() {
           </div>
         </>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-4 w-full overflow-hidden">
           <div className="flex flex-col space-y-2">
             <button 
               onClick={() => setSelectedFile(null)}

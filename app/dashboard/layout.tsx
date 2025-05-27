@@ -9,7 +9,7 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen overflow-hidden">
       {/* Fixed Sidebar for desktop */}
       <div className="hidden md:block">
         <div className="fixed top-0 left-0 h-screen w-64 z-30">
@@ -28,8 +28,10 @@ export default function DashboardLayout({
         </SheetContent>
       </Sheet>
       {/* Main Content with left margin for sidebar */}
-      <main className="flex-1 p-4 md:p-8 md:ml-64">
-        {children}
+      <main className="flex-1 p-4 md:p-8 md:ml-64 overflow-hidden w-full">
+        <div className="max-w-full overflow-hidden">
+          {children}
+        </div>
       </main>
     </div>
   )
