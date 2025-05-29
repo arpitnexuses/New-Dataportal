@@ -75,6 +75,123 @@ declare module '@tanstack/table-core' {
   }
 }
 
+// Define a set of more subtle pastel colors
+const COLUMN_COLORS = {
+  industry: [
+    "#ffe57f", // Darker yellow
+    "#ffcdd2", // Darker light red
+    "#c8e6c9", // Darker light green
+    "#bbdefb", // Darker light blue
+    "#e1bee7", // Darker light purple
+    "#b2ebf2", // Darker light cyan
+    "#ffe0b2", // Darker light orange
+    "#dcedc8", // Darker light lime
+    "#f8bbd0", // Darker light pink
+    "#e0e0e0", // Darker light grey
+    "#c5cae9", // Darker light indigo
+    "#b2dfdb", // Darker light teal
+  ],
+  country: [
+    "#ffcdd2", // Darker light red
+    "#f7dc6f", // Darker pale yellow
+    "#abebc6", // Darker pale green
+    "#bbdefb", // Darker pale blue
+    "#f5cba7", // Darker pale orange
+    "#f5b7b1", // Darker pale red
+    "#d7bde2", // Darker pale purple
+    "#a3e4d7", // Darker pale teal
+    "#f7dc6f", // Darker yellow
+    "#abebc6", // Darker green
+  ],
+  technologies: [
+    "#bbdefb", // Darker pale blue
+    "#b2dfdb", // Darker pale teal
+    "#fef5c3", // Darker pale yellow
+    "#f5b7b1", // Darker pale red
+    "#d5c5e5", // Darker pale purple
+    "#abebc6", // Darker pale green
+    "#f7dc6f", // Darker pale yellow
+    "#e6b0aa", // Darker pale red
+    "#f5b7b1", // Darker light red
+    "#aed6f1", // Darker light blue
+    "#a3e4d7", // Darker light teal
+    "#f7dc6f", // Darker light yellow
+  ]
+};
+
+// Function to get a consistent color for a specific column type
+const getColumnTypeColor = (value: string, columnType: 'industry' | 'country' | 'technologies'): string => {
+  // Create a hash of the value
+  const hash = value.split('').reduce((acc, char) => {
+    return char.charCodeAt(0) + ((acc << 5) - acc);
+  }, 0);
+  
+  // Use the hash to get a consistent index in our color array
+  const colors = COLUMN_COLORS[columnType];
+  const colorIndex = Math.abs(hash) % colors.length;
+  return colors[colorIndex];
+}
+
+// Function to check if a column is an industry column
+// Define a set of predefined pastel colors for industries
+const INDUSTRY_COLORS = [
+  "#ffeaa7", // Pastel yellow
+  "#fab1a0", // Pastel coral
+  "#81ecec", // Pastel cyan
+  "#a29bfe", // Pastel purple
+  "#74b9ff", // Pastel blue
+  "#55efc4", // Pastel mint
+  "#ff9ff3", // Pastel pink
+  "#ffeaa7", // Pastel yellow
+  "#e17055", // Darker coral
+  "#0984e3", // Darker blue
+  "#6c5ce7", // Darker purple
+  "#00cec9", // Darker cyan
+  "#fdcb6e", // Darker yellow
+  "#fd79a8", // Darker pink
+  "#00b894", // Darker mint
+];
+
+// Function to get a consistent color for an industry
+const getIndustryColor = (value: string): string => {
+  // Create a hash of the industry name
+  const hash = value.split('').reduce((acc, char) => {
+    return char.charCodeAt(0) + ((acc << 5) - acc);
+  }, 0);
+  
+  // Use the hash to get a consistent index in our color array
+  const colorIndex = Math.abs(hash) % INDUSTRY_COLORS.length;
+  return INDUSTRY_COLORS[colorIndex];
+}
+
+// Function to check if a column is an industry column
+const isIndustryColumn = (columnKey: string): boolean => {
+  const key = columnKey.toLowerCase();
+  return key === "industry" || 
+         key === "industry_client" || 
+         key === "industry_nexuses" ||
+         key.includes("industry");
+}
+
+// Function to check if a column is a country column
+const isCountryColumn = (columnKey: string): boolean => {
+  const key = columnKey.toLowerCase();
+  return key === "country" || 
+         key === "country_contact_person" ||
+         key === "contact_country" ||
+         key.includes("country") ||
+         key === "contact country";
+}
+
+// Function to check if a column is a technologies column
+const isTechnologiesColumn = (columnKey: string): boolean => {
+  const key = columnKey.toLowerCase();
+  return key === "technologies" || 
+         key.includes("tech") || 
+         key === "technology" ||
+         key === "techs";
+}
+
 // Function to generate consistent colors for different columns
 const getColumnColor = (value: string, columnKey: string) => {
   // Create a hash of the value string to get a consistent number
@@ -519,7 +636,8 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
         'account_name',
         'designation',
         'industry_client',
-        'country_contact_person'
+        'country_contact_person',
+        'email_id'
       ] : [
         'full_name',
         'company_name',
@@ -630,22 +748,24 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
       {
         id: "select",
         header: ({ table }) => (
-          <Checkbox
-            checked={table.getIsAllRowsSelected() || (Object.keys(rowSelection).length > 0 && table.getIsAllPageRowsSelected())}
-            onCheckedChange={(value) => {
-              if (value) {
-                selectAllRows();
-              } else {
-                deselectAllRows();
-              }
-            }}
-            aria-label="Select all"
-            className="translate-y-[2px]"
-          />
+          <div className="flex items-center justify-center w-full h-full bg-[#4f9eb2] px-4 py-1">
+            <Checkbox
+              checked={table.getIsAllRowsSelected() || (Object.keys(rowSelection).length > 0 && table.getIsAllPageRowsSelected())}
+              onCheckedChange={(value) => {
+                if (value) {
+                  selectAllRows();
+                } else {
+                  deselectAllRows();
+                }
+              }}
+              aria-label="Select all"
+              className="translate-y-[2px] border-white text-white"
+            />
+          </div>
         ),
         cell: ({ row }) => {
           return (
-            <div className="flex items-center justify-center w-full">
+            <div className="flex items-center justify-center w-full h-full">
               <Checkbox
                 checked={row.getIsSelected()}
                 onCheckedChange={(value) => row.toggleSelected(!!value)}
@@ -677,7 +797,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  className="h-8 -ml-3 font-medium text-gray-100 bg-[#4f9eb2] hover:text-white hover:bg-[#3e7e8e] tracking-wide text-sm"
+                  className="h-8 -ml-3 font-medium text-white bg-[#4f9eb2] hover:text-white hover:bg-[#3e7e8e] tracking-wide text-sm w-full justify-between"
                 >
                   <span>{COLUMN_DISPLAY_NAMES[columnKey.toLowerCase()] || columnKey.replace(/_/g, ' ')}</span>
                   <ChevronDown className="ml-1 h-3.5 w-3.5 opacity-70" />
@@ -725,24 +845,29 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
             const bgColor = getColumnColor(value, columnKey);
             
             // For Technologies column, show limited badges with "+X more"
-            if ((columnKey === "technologies") && value.includes(',')) {
+            if ((columnKey.toLowerCase() === "technologies" || columnKey.toLowerCase().includes("tech")) && value && value.includes(',')) {
               const techs = value.split(',').map(t => t.trim());
               const MAX_VISIBLE = 2; // Show only first 2 technologies
               const remainingCount = techs.length - MAX_VISIBLE;
               
               return (
-                <div className="flex items-center gap-1.5 max-w-[350px]">
+                <div className="flex items-center gap-1.5 max-w-[320px]">
                   {techs.slice(0, MAX_VISIBLE).map((tech: string, index: number) => (
                     <div 
                       key={index}
-                      className="px-2 py-0.5 rounded-md text-xs font-medium whitespace-nowrap border border-gray-200 bg-gray-50 text-gray-700"
+                      className="px-1.5 py-0.5 rounded-md text-xs font-medium whitespace-nowrap border text-gray-700"
+                      style={{ 
+                        backgroundColor: getColumnTypeColor(tech, 'technologies'),
+                        borderColor: getColumnTypeColor(tech, 'technologies')
+                      }}
                     >
                       {tech}
                     </div>
                   ))}
                   {remainingCount > 0 && (
                     <div 
-                      className="px-2 py-0.5 rounded-md text-xs font-medium whitespace-nowrap bg-gray-50 text-gray-500 border border-gray-200"
+                      className="px-1.5 py-0.5 rounded-md text-xs font-medium whitespace-nowrap text-gray-500 border"
+                      style={{ backgroundColor: "#f0f0f0", borderColor: "#e0e0e0" }}
                       title={techs.slice(MAX_VISIBLE).join(', ')} // Show remaining on hover
                     >
                       +{remainingCount}
@@ -756,11 +881,11 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
             if (columnKey === "title" || columnKey === "designation") {
               return (
                 <div 
-                  className="inline-flex items-center whitespace-nowrap overflow-hidden text-ellipsis max-w-[180px]"
+                  className="inline-flex items-center whitespace-nowrap overflow-hidden text-ellipsis max-w-[160px]"
                   title={value} // Show full text on hover
                 >
                   <div 
-                    className="w-2 h-2 rounded-full mr-2 flex-shrink-0 bg-[#4f9eb2]"
+                    className="w-2 h-2 rounded-full mr-1.5 flex-shrink-0 bg-[#4f9eb2]"
                   />
                   <span className="text-sm text-gray-700 font-medium truncate">
                     {value}
@@ -770,15 +895,39 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
             }
 
             // Industry, Country and other badge columns
+            let badgeColor = 'rgb(249 250 251)'; // Default light gray
+            let borderColor = 'rgb(229 231 235)'; // Default light border
+            
+            // Determine column type
+            const colKey = columnKey.toLowerCase();
+            if (colKey === "industry" || 
+                colKey === "industry_client" || 
+                colKey.includes("industry")) {
+              badgeColor = getColumnTypeColor(value, 'industry');
+              borderColor = badgeColor;
+            } else if (colKey === "country" || 
+                       colKey === "country_contact_person" || 
+                       colKey === "contact_country" || 
+                       colKey.includes("country")) {
+              badgeColor = getColumnTypeColor(value, 'country');
+              borderColor = badgeColor;
+            } else if (colKey === "technologies" || 
+                       colKey.includes("tech")) {
+              badgeColor = getColumnTypeColor(value, 'technologies');
+              borderColor = badgeColor;
+            }
+            
             return (
               <div 
-                className="px-2 py-0.5 rounded-md inline-block max-w-[200px] text-xs font-medium border border-gray-200 bg-gray-50 text-gray-700"
+                className={`px-2 py-0.5 rounded-md inline-block max-w-[180px] text-xs font-medium border text-gray-700`}
                 style={{ 
                   textOverflow: 'ellipsis',
                   overflow: 'hidden',
-                  whiteSpace: 'nowrap'
+                  whiteSpace: 'nowrap',
+                  backgroundColor: badgeColor,
+                  borderColor: borderColor
                 }}
-                title={value} // Show full text on hover
+                title={value}
               >
                 {value}
               </div>
@@ -789,7 +938,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
           if (columnKey === "email" || columnKey === "email_id" || columnKey.toLowerCase().includes('email')) {
             return (
               <div 
-                className="text-black h-6 flex items-center whitespace-nowrap overflow-hidden text-ellipsis max-w-[230px] gap-1.5 group"
+                className="text-black h-5 flex items-center whitespace-nowrap overflow-hidden text-ellipsis max-w-[200px] gap-1.5 group"
                 title={value}
               >
                 <Mail className="h-3.5 w-3.5 text-[#4f9eb2] flex-shrink-0 opacity-70 group-hover:opacity-100" />
@@ -802,7 +951,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
           if (columnKey === "company_phone" || columnKey === "personal_phone" || columnKey === "contact_number_personal" || columnKey.toLowerCase().includes('phone')) {
             return (
               <div 
-                className="text-black h-6 flex items-center whitespace-nowrap overflow-hidden text-ellipsis max-w-[180px] gap-1.5 group"
+                className="text-black h-5 flex items-center whitespace-nowrap overflow-hidden text-ellipsis max-w-[160px] gap-1.5 group"
                 title={value}
               >
                 <Phone className="h-3.5 w-3.5 text-[#4f9eb2] flex-shrink-0 opacity-70 group-hover:opacity-100" />
@@ -815,7 +964,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
           if (columnKey === "website") {
             return (
               <div 
-                className="text-black max-w-[180px] truncate h-6 flex items-center gap-1.5 group"
+                className="text-black max-w-[140px] truncate h-5 flex items-center gap-1.5 group"
                 title={value}
               >
                 <Globe className="h-3.5 w-3.5 text-[#4f9eb2] flex-shrink-0 opacity-70 group-hover:opacity-100" />
@@ -828,7 +977,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
           if (columnKey.includes("linkedin_url") || columnKey.includes("linkedin")) {
             return (
               <div 
-                className="text-black max-w-[180px] truncate h-6 flex items-center gap-1.5 group"
+                className="text-black max-w-[160px] truncate h-5 flex items-center gap-1.5 group"
                 title={value}
               >
                 <LinkedinIcon className="h-3.5 w-3.5 text-[#4f9eb2] flex-shrink-0 opacity-70 group-hover:opacity-100" />
@@ -841,7 +990,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
           if (columnKey === "company_name" || columnKey === "account_name") {
             return (
               <div 
-                className="text-black h-6 flex items-center whitespace-nowrap overflow-hidden text-ellipsis max-w-[180px] gap-1.5 group"
+                className="text-black h-5 flex items-center whitespace-nowrap overflow-hidden text-ellipsis max-w-[160px] gap-1.5 group"
                 title={value}
               >
                 <Building2 className="h-3.5 w-3.5 text-[#4f9eb2] flex-shrink-0 opacity-70 group-hover:opacity-100" />
@@ -854,7 +1003,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
           if (columnKey === "company_address" || columnKey === "company_headquarter" || columnKey === "city" || columnKey === "state") {
             return (
               <div 
-                className="text-black h-6 flex items-center whitespace-nowrap overflow-hidden text-ellipsis max-w-[180px] gap-1.5 group"
+                className="text-black h-5 flex items-center whitespace-nowrap overflow-hidden text-ellipsis max-w-[160px] gap-1.5 group"
                 title={value}
               >
                 <MapPin className="h-3.5 w-3.5 text-[#4f9eb2] flex-shrink-0 opacity-70 group-hover:opacity-100" />
@@ -867,7 +1016,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
           if (columnKey === "workmates_remark" || columnKey === "tm_remarks") {
             return (
               <div 
-                className="text-black h-6 flex items-center whitespace-nowrap overflow-hidden text-ellipsis max-w-[180px]"
+                className="text-black h-5 flex items-center whitespace-nowrap overflow-hidden text-ellipsis max-w-[160px]"
                 title={value}
               >
                 <Info className="h-3.5 w-3.5 text-[#4f9eb2] flex-shrink-0 opacity-70 mr-1.5" />
@@ -879,7 +1028,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
           // Default rendering for other columns
           return (
             <div 
-              className="text-black h-6 flex items-center whitespace-nowrap overflow-hidden text-ellipsis max-w-[180px]"
+              className="text-black h-5 flex items-center whitespace-nowrap overflow-hidden text-ellipsis max-w-[160px]"
               title={value}
             >
               {value}
@@ -1277,7 +1426,9 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                                 'account_name',
                                 'designation',
                                 'industry_client',
-                                'country_contact_person'
+                                'country_contact_person',
+                                'technologies',
+                                'email_id'
                               ] : [
                                 'full_name',
                                 'company_name',
@@ -1368,10 +1519,10 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
             </div>
 
             {/* Main Table - Fixed overflow container structure */}
-            <div className="overflow-hidden rounded-xl border border-gray-100 shadow-sm w-full">
+            <div className="overflow-hidden rounded-md border border-gray-100 shadow-sm w-full">
               <div className="overflow-x-auto">
                 <div style={{ width: 'fit-content', minWidth: '100%', maxWidth: 'max-content' }}>
-                  <Table className="select-none bg-white w-full" style={{ tableLayout: 'auto' }}>
+                  <Table className="select-none bg-white w-full border-collapse border border-gray-200" style={{ tableLayout: 'auto' }}>
                     <TableHeader>
                       {table.getHeaderGroups().map((headerGroup) => (
                         <TableRow 
@@ -1382,18 +1533,24 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                             <TableHead 
                               key={header.id} 
                               className={cn(
-                                "text-gray-600 font-medium bg-white px-6 py-4 first:rounded-tl-xl last:rounded-tr-xl border-b border-gray-100 select-none text-sm transition-all duration-200",
-                                header.id === "select" && "w-[40px] pr-0",
+                                "text-white font-medium px-6 py-3 first:rounded-tl-md last:rounded-tr-md select-none text-sm transition-all duration-200",
+                                header.id === "select" && "w-[40px] px-0",
                                 "relative z-10"
                               )}
                               style={{ 
                                 width: header.id === "select" ? "40px" : 
-                                      header.id === "Technologies" ? "200px" : 
-                                      header.id === "Industry" || header.id === "Country" ? "120px" : 
-                                      header.id === "email" || header.id === "website" ? "180px" : "150px",
+                                      header.id === "Technologies" ? "180px" : 
+                                      header.id === "Industry" || header.id === "industry_client" ? "100px" : 
+                                      header.id === "Country" || header.id === "country_contact_person" ? "100px" : 
+                                      header.id === "email" || header.id === "email_id" ? "160px" : 
+                                      header.id === "website" ? "140px" : "120px",
                                 overflow: "hidden",
                                 textOverflow: "ellipsis",
-                                whiteSpace: "nowrap"
+                                whiteSpace: "nowrap",
+                                backgroundColor: "#4f9eb2",
+                                borderColor: "#4f9eb2",
+                                borderWidth: "1px",
+                                borderStyle: "solid"
                               }}
                             >
                               {header.isPlaceholder
@@ -1414,9 +1571,8 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                             key={row.id}
                             data-state={row.getIsSelected() && "selected"}
                             className={cn(
-                              "hover:bg-gray-50/50 cursor-pointer bg-white select-none transition-all duration-200",
+                              "hover:bg-gray-50/50 cursor-pointer select-none transition-all duration-200",
                               row.getIsSelected() ? "bg-[#EAE7FF] border-[#8370FC]/30" : "bg-white",
-                              rowIndex === table.getRowModel().rows.length - 1 ? "last:border-b-0" : "border-b border-gray-100",
                               "hover:shadow-sm"
                             )}
                             onClick={() => {
@@ -1428,23 +1584,26 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                               <TableCell 
                                 key={cell.id} 
                                 className={cn(
-                                  "text-gray-600 px-6 py-4 bg-white select-none text-sm transition-all duration-200",
-                                  cell.column.id === "select" && "pr-0 pl-6 w-[40px]",
+                                  "text-gray-600 px-6 py-2.5 select-none text-sm transition-all duration-200 border border-gray-200",
+                                  cell.column.id === "select" && "pr-0 pl-0 w-[40px] text-center",
                                   row.getIsSelected() && "bg-[#EAE7FF]",
-                                  rowIndex === table.getRowModel().rows.length - 1 && cellIndex === 0 && "rounded-bl-xl",
-                                  rowIndex === table.getRowModel().rows.length - 1 && cellIndex === row.getVisibleCells().length - 1 && "rounded-br-xl",
+                                  rowIndex === table.getRowModel().rows.length - 1 && cellIndex === 0 && "rounded-bl-md",
+                                  rowIndex === table.getRowModel().rows.length - 1 && cellIndex === row.getVisibleCells().length - 1 && "rounded-br-md",
                                   "relative z-0 overflow-hidden"
                                 )}
                                 style={{ 
                                   userSelect: 'none', 
                                   WebkitUserSelect: 'none',
                                   width: cell.column.id === "select" ? "40px" : 
-                                        cell.column.id === "Technologies" ? "200px" : 
-                                        cell.column.id === "Industry" || cell.column.id === "Country" ? "120px" : 
-                                        cell.column.id === "email" || cell.column.id === "website" ? "180px" : "150px",
+                                        cell.column.id === "Technologies" ? "180px" : 
+                                        cell.column.id === "Industry" || cell.column.id === "industry_client" ? "100px" : 
+                                        cell.column.id === "Country" || cell.column.id === "country_contact_person" ? "100px" : 
+                                        cell.column.id === "email" || cell.column.id === "email_id" ? "160px" : 
+                                        cell.column.id === "website" ? "140px" : "120px",
                                   overflow: "hidden",
                                   textOverflow: "ellipsis",
-                                  whiteSpace: "nowrap"
+                                  whiteSpace: "nowrap",
+                                  backgroundColor: row.getIsSelected() ? "#EAE7FF" : "white"
                                 }}
                               >
                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -1456,7 +1615,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                         <TableRow>
                           <TableCell
                             colSpan={columns.length}
-                            className="h-24 text-center text-gray-400 bg-white select-none rounded-b-xl"
+                            className="h-20 text-center text-gray-400 bg-white select-none rounded-b-md border border-gray-200"
                           >
                             No results.
                           </TableCell>
@@ -1579,7 +1738,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                 
                 <div className="overflow-auto flex-grow mt-4 pr-2">
                   <div style={{ width: 'fit-content', minWidth: '100%' }}>
-                    <Table className="w-full">
+                    <Table className="w-full border-collapse border border-gray-200">
                       <TableHeader>
                         <TableRow className="border-none">
                           {table.getVisibleLeafColumns()
@@ -1588,8 +1747,13 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                             .map((column) => (
                               <TableHead 
                                 key={column.id} 
-                                className="bg-white px-6 py-4 text-sm font-medium text-gray-600 border-b border-gray-100"
-                                style={{ minWidth: "180px" }}
+                                className="bg-[#4f9eb2] text-white px-6 py-3 text-sm font-medium"
+                                style={{ 
+                                  minWidth: "140px",
+                                  borderColor: "#4f9eb2",
+                                  borderWidth: "1px",
+                                  borderStyle: "solid"
+                                }}
                               >
                                 {column.id.replace(/_/g, ' ')}
                               </TableHead>
@@ -1614,10 +1778,10 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                                     return (
                                       <TableCell 
                                         key={column.id} 
-                                        className="px-6 py-4 text-sm border-b border-gray-100 text-gray-600"
+                                        className="px-6 py-2.5 text-sm border border-gray-200 text-gray-600"
                                       >
                                         <div 
-                                          className="px-3 py-1.5 rounded-lg inline-block text-xs font-medium border bg-blue-50 text-blue-700 border-blue-100 shadow-sm"
+                                          className="px-2 py-1 rounded-lg inline-block text-xs font-medium border bg-blue-50 text-blue-700 border-blue-100 shadow-sm"
                                         >
                                           {value}
                                         </div>
@@ -1627,12 +1791,24 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                                   return (
                                     <TableCell 
                                       key={column.id} 
-                                      className="px-6 py-4 text-sm border-b border-gray-100 text-gray-600"
+                                      className="px-6 py-2.5 text-sm border border-gray-200 text-gray-600"
                                     >
                                       {typeof value === 'string' ? (
                                         (column.id === "Industry" || column.id === "Country" || column.id === "Technologies") ? (
                                           <div 
-                                            className="px-3 py-1.5 rounded-lg inline-block text-xs font-medium border bg-gray-50 text-gray-700 border-gray-100 shadow-sm"
+                                            className="px-2 py-1 rounded-lg inline-block text-xs font-medium border text-gray-700 shadow-sm"
+                                            style={{
+                                              backgroundColor: (column.id === "Industry") 
+                                                ? getColumnTypeColor(value, 'industry')
+                                                : (column.id === "Country")
+                                                  ? getColumnTypeColor(value, 'country')
+                                                  : getColumnTypeColor(value, 'technologies'),
+                                              borderColor: (column.id === "Industry") 
+                                                ? getColumnTypeColor(value, 'industry')
+                                                : (column.id === "Country")
+                                                  ? getColumnTypeColor(value, 'country')
+                                                  : getColumnTypeColor(value, 'technologies')
+                                            }}
                                           >
                                             {value}
                                           </div>
@@ -1652,7 +1828,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                           <TableRow>
                             <TableCell 
                               colSpan={6}
-                              className="px-6 py-4 text-center text-sm text-gray-500 italic bg-gray-50/50"
+                              className="px-6 py-3 text-center text-sm text-gray-500 italic bg-gray-50/50 border border-gray-200"
                             >
                               ... and {table.getSelectedRowModel().rows.length - 50} more records
                             </TableCell>
@@ -1949,7 +2125,9 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                             'account_name',
                             'designation',
                             'industry_client',
-                            'country_contact_person'
+                            'country_contact_person',
+                            'technologies',
+                            'email_id'
                           ] : [
                             'full_name',
                             'company_name',
@@ -2040,10 +2218,10 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
         </div>
 
         {/* Main Table - Fixed overflow container structure */}
-        <div className="overflow-hidden rounded-xl border border-gray-100 shadow-sm w-full">
+        <div className="overflow-hidden rounded-md border border-gray-100 shadow-sm w-full">
           <div className="overflow-x-auto">
             <div style={{ width: 'fit-content', minWidth: '100%', maxWidth: 'max-content' }}>
-              <Table className="select-none bg-white w-full" style={{ tableLayout: 'auto' }}>
+              <Table className="select-none bg-white w-full border-collapse border border-gray-200" style={{ tableLayout: 'auto' }}>
                 <TableHeader>
                   {table.getHeaderGroups().map((headerGroup) => (
                     <TableRow 
@@ -2054,18 +2232,24 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                         <TableHead 
                           key={header.id} 
                           className={cn(
-                            "text-gray-600 font-medium bg-white px-6 py-4 first:rounded-tl-xl last:rounded-tr-xl border-b border-gray-100 select-none text-sm transition-all duration-200",
-                            header.id === "select" && "w-[40px] pr-0",
+                            "text-white font-medium px-6 py-3 first:rounded-tl-md last:rounded-tr-md select-none text-sm transition-all duration-200",
+                            header.id === "select" && "w-[40px] px-0",
                             "relative z-10"
                           )}
                           style={{ 
                             width: header.id === "select" ? "40px" : 
-                                  header.id === "Technologies" ? "200px" : 
-                                  header.id === "Industry" || header.id === "Country" ? "120px" : 
-                                  header.id === "email" || header.id === "website" ? "180px" : "150px",
+                                  header.id === "Technologies" ? "180px" : 
+                                  header.id === "Industry" || header.id === "industry_client" ? "100px" : 
+                                  header.id === "Country" || header.id === "country_contact_person" ? "100px" : 
+                                  header.id === "email" || header.id === "email_id" ? "160px" : 
+                                  header.id === "website" ? "140px" : "120px",
                             overflow: "hidden",
                             textOverflow: "ellipsis",
-                            whiteSpace: "nowrap"
+                            whiteSpace: "nowrap",
+                            backgroundColor: "#4f9eb2",
+                            borderColor: "#4f9eb2",
+                            borderWidth: "1px",
+                            borderStyle: "solid"
                           }}
                         >
                           {header.isPlaceholder
@@ -2086,9 +2270,8 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                         key={row.id}
                         data-state={row.getIsSelected() && "selected"}
                         className={cn(
-                          "hover:bg-gray-50/50 cursor-pointer bg-white select-none transition-all duration-200",
+                          "hover:bg-gray-50/50 cursor-pointer select-none transition-all duration-200",
                           row.getIsSelected() ? "bg-[#EAE7FF] border-[#8370FC]/30" : "bg-white",
-                          rowIndex === table.getRowModel().rows.length - 1 ? "last:border-b-0" : "border-b border-gray-100",
                           "hover:shadow-sm"
                         )}
                         onClick={() => {
@@ -2100,23 +2283,26 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                           <TableCell 
                             key={cell.id} 
                             className={cn(
-                              "text-gray-600 px-6 py-4 bg-white select-none text-sm transition-all duration-200",
-                              cell.column.id === "select" && "pr-0 pl-6 w-[40px]",
+                              "text-gray-600 px-6 py-2.5 select-none text-sm transition-all duration-200 border border-gray-200",
+                              cell.column.id === "select" && "pr-0 pl-0 w-[40px] text-center",
                               row.getIsSelected() && "bg-[#EAE7FF]",
-                              rowIndex === table.getRowModel().rows.length - 1 && cellIndex === 0 && "rounded-bl-xl",
-                              rowIndex === table.getRowModel().rows.length - 1 && cellIndex === row.getVisibleCells().length - 1 && "rounded-br-xl",
+                              rowIndex === table.getRowModel().rows.length - 1 && cellIndex === 0 && "rounded-bl-md",
+                              rowIndex === table.getRowModel().rows.length - 1 && cellIndex === row.getVisibleCells().length - 1 && "rounded-br-md",
                               "relative z-0 overflow-hidden"
                             )}
                             style={{ 
                               userSelect: 'none', 
                               WebkitUserSelect: 'none',
                               width: cell.column.id === "select" ? "40px" : 
-                                    cell.column.id === "Technologies" ? "200px" : 
-                                    cell.column.id === "Industry" || cell.column.id === "Country" ? "120px" : 
-                                    cell.column.id === "email" || cell.column.id === "website" ? "180px" : "150px",
+                                    cell.column.id === "Technologies" ? "180px" : 
+                                    cell.column.id === "Industry" || cell.column.id === "industry_client" ? "100px" : 
+                                    cell.column.id === "Country" || cell.column.id === "country_contact_person" ? "100px" : 
+                                    cell.column.id === "email" || cell.column.id === "email_id" ? "160px" : 
+                                    cell.column.id === "website" ? "140px" : "120px",
                               overflow: "hidden",
                               textOverflow: "ellipsis",
-                              whiteSpace: "nowrap"
+                              whiteSpace: "nowrap",
+                              backgroundColor: row.getIsSelected() ? "#EAE7FF" : "white"
                             }}
                           >
                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -2128,7 +2314,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                     <TableRow>
                       <TableCell
                         colSpan={columns.length}
-                        className="h-24 text-center text-gray-400 bg-white select-none rounded-b-xl"
+                        className="h-20 text-center text-gray-400 bg-white select-none rounded-b-md border border-gray-200"
                       >
                         No results.
                       </TableCell>
@@ -2251,7 +2437,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
             
             <div className="overflow-auto flex-grow mt-4 pr-2">
               <div style={{ width: 'fit-content', minWidth: '100%' }}>
-                <Table className="w-full">
+                <Table className="w-full border-collapse border border-gray-200">
                   <TableHeader>
                     <TableRow className="border-none">
                       {table.getVisibleLeafColumns()
@@ -2260,8 +2446,13 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                         .map((column) => (
                           <TableHead 
                             key={column.id} 
-                            className="bg-white px-6 py-4 text-sm font-medium text-gray-600 border-b border-gray-100"
-                            style={{ minWidth: "180px" }}
+                            className="bg-[#4f9eb2] text-white px-6 py-3 text-sm font-medium"
+                            style={{ 
+                              minWidth: "140px",
+                              borderColor: "#4f9eb2",
+                              borderWidth: "1px",
+                              borderStyle: "solid"
+                            }}
                           >
                             {column.id.replace(/_/g, ' ')}
                           </TableHead>
@@ -2286,10 +2477,10 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                                 return (
                                   <TableCell 
                                     key={column.id} 
-                                    className="px-6 py-4 text-sm border-b border-gray-100 text-gray-600"
+                                    className="px-6 py-2.5 text-sm border border-gray-200 text-gray-600"
                                   >
                                     <div 
-                                      className="px-3 py-1.5 rounded-lg inline-block text-xs font-medium border bg-blue-50 text-blue-700 border-blue-100 shadow-sm"
+                                      className="px-2 py-1 rounded-lg inline-block text-xs font-medium border bg-blue-50 text-blue-700 border-blue-100 shadow-sm"
                                     >
                                       {value}
                                     </div>
@@ -2299,12 +2490,24 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                               return (
                                 <TableCell 
                                   key={column.id} 
-                                  className="px-6 py-4 text-sm border-b border-gray-100 text-gray-600"
+                                  className="px-6 py-2.5 text-sm border border-gray-200 text-gray-600"
                                 >
                                   {typeof value === 'string' ? (
                                     (column.id === "Industry" || column.id === "Country" || column.id === "Technologies") ? (
                                       <div 
-                                        className="px-3 py-1.5 rounded-lg inline-block text-xs font-medium border bg-gray-50 text-gray-700 border-gray-100 shadow-sm"
+                                        className="px-2 py-1 rounded-lg inline-block text-xs font-medium border text-gray-700 shadow-sm"
+                                        style={{
+                                          backgroundColor: (column.id === "Industry") 
+                                            ? getColumnTypeColor(value, 'industry')
+                                            : (column.id === "Country")
+                                              ? getColumnTypeColor(value, 'country')
+                                              : getColumnTypeColor(value, 'technologies'),
+                                          borderColor: (column.id === "Industry") 
+                                            ? getColumnTypeColor(value, 'industry')
+                                            : (column.id === "Country")
+                                              ? getColumnTypeColor(value, 'country')
+                                              : getColumnTypeColor(value, 'technologies')
+                                        }}
                                       >
                                         {value}
                                       </div>
@@ -2324,7 +2527,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                       <TableRow>
                         <TableCell 
                           colSpan={6}
-                          className="px-6 py-4 text-center text-sm text-gray-500 italic bg-gray-50/50"
+                          className="px-6 py-3 text-center text-sm text-gray-500 italic bg-gray-50/50 border border-gray-200"
                         >
                           ... and {table.getSelectedRowModel().rows.length - 50} more records
                         </TableCell>
