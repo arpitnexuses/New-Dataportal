@@ -74,7 +74,7 @@ export default function ListPage() {
     <div className="space-y-4 overflow-hidden max-w-full">
       {!selectedFile ? (
         <>
-          <h1 className="text-3xl font-bold text-gray-800">Files</h1>
+          <h1 className="text-3xl pl-16 md:pl-0 font-bold text-gray-800">Files</h1>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {/* All Files Card */}
             <Card 
@@ -157,7 +157,7 @@ export default function ListPage() {
         </>
       ) : (
         <div className="space-y-4 w-full overflow-hidden">
-          <div className="flex flex-col space-y-2">
+          <div className="flex flex-col space-y-2 pl-12 md:pl-0">
             <button 
               onClick={() => setSelectedFile(null)}
               className="flex items-center gap-2 text-sm text-[#4f9eb2] hover:text-[#3e7e8e] transition-colors w-fit group"
