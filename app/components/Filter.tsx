@@ -368,16 +368,17 @@ export default function Filter({ isOpen, onClose, onApplyFilters, data }: Filter
       )}
       
       <div
-        className={`fixed right-0 top-0 h-full w-96 bg-[#1C1C1C] shadow-lg transform transition-transform duration-300 ease-in-out ${
+        className={`fixed right-0 top-0 h-full w-full sm:w-[90%] md:w-80 lg:w-96 bg-[#1C1C1C] shadow-lg transform transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
-        } z-50 flex flex-col border-l border-white/20`}
+        } z-50 flex flex-col border-l border-white/20 overflow-hidden`}
       >
         <div className="flex-none p-4 border-b border-gray-800">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-semibold text-white">Filters</h2>
             <button
               onClick={onClose}
-              className="p-1 hover:bg-gray-900 rounded-full text-gray-400 hover:text-white"
+              className="p-2 hover:bg-gray-900 rounded-full text-gray-400 hover:text-white touch-manipulation"
+              aria-label="Close filter panel"
             >
               <XCircle className="w-6 h-6" />
             </button>
@@ -387,23 +388,23 @@ export default function Filter({ isOpen, onClose, onApplyFilters, data }: Filter
         <ScrollArea className="flex-grow">
           <div className="p-4 space-y-6">
             {filterSections.map((section) => (
-              <div key={section.title} className="space-y-2">
+              <div key={section.title} className="space-y-3">
                 <div className="text-sm font-medium text-gray-300">
                   {section.title.replace(/_/g, ' ')}
                 </div>
                 
                 <div className="relative">
-                  {/* Selected Items Display */}
+                  {/* Selected Items Display - Mobile optimized */}
                   <div 
-                    className="min-h-[42px] bg-[#1C1C1C] rounded-md px-3 py-2 cursor-pointer border border-gray-800 hover:border-gray-700"
+                    className="min-h-[48px] bg-[#1C1C1C] rounded-md px-4 py-3 cursor-pointer border border-gray-800 hover:border-gray-700 active:bg-gray-900/50 transition-colors"
                     onClick={() => setOpenSection(openSection === section.title ? null : section.title)}
                   >
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2 pr-8">
                       {selectedFilters[section.title]?.length ? (
                         selectedFilters[section.title].map(value => (
                           <span 
                             key={value} 
-                            className="inline-flex items-center gap-1 bg-white/10 text-white text-sm rounded px-2 py-1"
+                            className="inline-flex items-center gap-1.5 bg-white/10 text-white text-sm rounded-full px-3 py-1.5"
                           >
                             {getSelectedLabel(section.title, value)}
                             <button
@@ -411,34 +412,35 @@ export default function Filter({ isOpen, onClose, onApplyFilters, data }: Filter
                                 e.stopPropagation();
                                 removeFilter(section.title, value);
                               }}
-                              className="hover:text-gray-300"
+                              className="hover:text-gray-300 p-0.5 active:bg-white/5 rounded-full"
+                              aria-label={`Remove ${getSelectedLabel(section.title, value)} filter`}
                             >
-                              <X className="h-3 w-3" />
+                              <X className="h-3.5 w-3.5" />
                             </button>
                           </span>
                         ))
                       ) : (
-                        <span className="text-gray-500">Select {section.title.replace(/_/g, ' ').toLowerCase()}...</span>
+                        <span className="text-gray-500 py-1">Select {section.title.replace(/_/g, ' ').toLowerCase()}...</span>
                       )}
                     </div>
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                      <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                      <ChevronDown className={`h-5 w-5 text-gray-400 transition-transform ${
                         openSection === section.title ? 'transform rotate-180' : ''
                       }`} />
                     </div>
                   </div>
 
-                  {/* Dropdown Options */}
+                  {/* Dropdown Options - Mobile optimized */}
                   {openSection === section.title && section.options.length > 0 && (
                     <div className="absolute z-10 mt-1 w-full bg-[#1C1C1C] border border-gray-800 rounded-md shadow-lg">
-                      <div className="py-1 max-h-48 overflow-auto scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent">
+                      <div className="py-1.5 max-h-60 overflow-auto scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent">
                         {section.options.map((option) => (
                           <div
                             key={option.value}
-                            className={`flex items-center px-3 py-2 cursor-pointer ${
+                            className={`flex items-center px-4 py-3 cursor-pointer transition-colors touch-manipulation ${
                               selectedFilters[section.title]?.includes(option.value)
                                 ? 'bg-white/10 text-white'
-                                : 'text-gray-400 hover:bg-gray-900 hover:text-white'
+                                : 'text-gray-400 hover:bg-gray-900 hover:text-white active:bg-gray-800'
                             }`}
                             onClick={() => handleFilterSelect(section.title, option.value, option.label)}
                           >
@@ -454,17 +456,17 @@ export default function Filter({ isOpen, onClose, onApplyFilters, data }: Filter
           </div>
         </ScrollArea>
 
-        <div className="flex-none p-4 border-t border-gray-800 mb-4">
-          <div className="flex justify-between">
+        <div className="flex-none p-4 border-t border-gray-800 mb-safe">
+          <div className="flex justify-between gap-2">
             <button
               onClick={clearFilters}
-              className="px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-900 rounded"
+              className="px-4 py-3 text-sm text-gray-400 hover:text-white hover:bg-gray-900 active:bg-gray-800 rounded-md transition-colors flex-1 touch-manipulation"
             >
               Clear all
             </button>
             <button
               onClick={handleApply}
-              className="px-4 py-2 text-sm bg-white text-black font-medium rounded hover:bg-gray-200"
+              className="px-4 py-3 text-sm bg-white text-black font-medium rounded-md hover:bg-gray-200 active:bg-gray-300 transition-colors flex-1 touch-manipulation"
             >
               Apply Filters
             </button>

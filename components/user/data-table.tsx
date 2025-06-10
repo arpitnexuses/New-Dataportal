@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Download, Eye, Search, Filter, ChevronDown, AlertCircle,
-  Building2, Mail, Phone, Users, Globe, LinkedinIcon, DollarSign, Briefcase, MapPin, Info, User } from "lucide-react"
+  Building2, Mail, Phone, Users, Globe, LinkedinIcon, DollarSign, Briefcase, MapPin, Info, User, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Table,
@@ -1361,20 +1361,23 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
 
             {/* Filters Section */}
             <div className="flex flex-col gap-2 mb-3 px-1">
-              {/* Top Row - Search and Actions */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 w-full max-w-sm">
+              {/* Top Row - Search and Actions - Responsive */}
+              <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+                {/* Search - Full width on mobile, normal on desktop */}
+                <div className="w-full sm:max-w-sm">
                   <div className="relative w-full">
                     <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
                     <Input
                       placeholder="Search in all columns..."
                       value={globalFilter ?? ""}
                       onChange={(event) => setGlobalFilter(event.target.value)}
-                      className="pl-9 py-2 h-10 bg-white border-gray-200 text-gray-800 placeholder:text-gray-400 focus-visible:ring-[#8370FC] focus-visible:ring-opacity-30 focus-visible:border-[#8370FC] rounded-md"
+                      className="pl-9 py-2 h-10 bg-white border-gray-200 text-gray-800 placeholder:text-gray-400 focus-visible:ring-[#8370FC] focus-visible:ring-opacity-30 focus-visible:border-[#8370FC] rounded-md w-full"
                     />
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                
+                {/* Action Buttons - Row with wrapping */}
+                <div className="flex flex-wrap items-center gap-2 mt-2 sm:mt-0">
                   <Button
                     variant="outline"
                     size="sm"
@@ -1385,10 +1388,14 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                       }
                       setIsFilterOpen(true);
                     }}
-                    className="text-gray-700 border-gray-200 hover:bg-gray-50 flex items-center gap-2 h-10 rounded-md"
+                    className="text-gray-700 border-gray-200 hover:bg-gray-50 flex items-center gap-1.5 h-9 rounded-md text-xs sm:text-sm flex-1 sm:flex-auto justify-center sm:justify-start"
                   >
-                    <Filter className="h-4 w-4" />
-                    Advanced Filters {Object.keys(activeFilters).length > 0 && `(${Object.keys(activeFilters).length})`}
+                    <Filter className="h-4 w-4 flex-shrink-0" />
+                    <span className="truncate">
+                      {Object.keys(activeFilters).length > 0 
+                        ? `Filters (${Object.keys(activeFilters).length})` 
+                        : "Filters"}
+                    </span>
                   </Button>
                 
                   <DropdownMenu>
@@ -1396,10 +1403,10 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                       <Button
                         variant="outline"
                         size="sm"
-                        className="text-gray-700 border-gray-200 hover:bg-gray-50 flex items-center gap-2 h-10 rounded-md"
+                        className="text-gray-700 border-gray-200 hover:bg-gray-50 flex items-center gap-1.5 h-9 rounded-md text-xs sm:text-sm flex-1 sm:flex-auto justify-center sm:justify-start"
                       >
-                        <Eye className="h-4 w-4" />
-                        Columns
+                        <Eye className="h-4 w-4 flex-shrink-0" />
+                        <span className="truncate">Columns</span>
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg rounded-md w-56">
@@ -1507,12 +1514,16 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                   <Button
                     variant="outline"
                     size="sm"
-                    className="text-gray-700 border-gray-200 hover:bg-gray-50 flex items-center gap-2 h-10 rounded-md"
+                    className="text-gray-700 border-gray-200 hover:bg-gray-50 flex items-center gap-1.5 h-9 rounded-md text-xs sm:text-sm flex-1 sm:flex-auto justify-center sm:justify-start"
                     onClick={handleReviewSelected}
                     disabled={!userData || userData.dataFiles[selectedFileIndex]?.data.length === 0 || exporting}
                   >
-                    <Download className="h-4 w-4" />
-                    Review & Export
+                    <Download className="h-4 w-4 flex-shrink-0" />
+                    <span className="truncate">
+                      {table.getFilteredSelectedRowModel().rows.length > 0 
+                        ? `Export (${table.getFilteredSelectedRowModel().rows.length})` 
+                        : "Export"}
+                    </span>
                   </Button>
                 </div>
               </div>
@@ -1629,9 +1640,10 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
 
             {/* Pagination */}
             <div className="flex flex-col gap-4 py-4 px-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <p className="text-sm font-medium text-gray-600">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                {/* Rows per page selector - responsive */}
+                <div className="flex items-center space-x-2">
+                  <p className="text-sm font-medium text-gray-600 hidden sm:block">
                     Rows per page
                   </p>
                   <Select
@@ -1640,7 +1652,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                       table.setPageSize(Number(value));
                     }}
                   >
-                    <SelectTrigger className="h-9 w-[80px]">
+                    <SelectTrigger className="h-8 sm:h-9 w-[70px] sm:w-[80px]">
                       <SelectValue placeholder={pageSize} />
                     </SelectTrigger>
                     <SelectContent side="top">
@@ -1653,36 +1665,46 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                   </Select>
                 </div>
 
-                <Pagination>
-                  <PaginationContent className="gap-2">
+                {/* Pagination - responsive */}
+                <Pagination className="order-last sm:order-none w-full sm:w-auto flex justify-center">
+                  <PaginationContent className="gap-1 sm:gap-2">
                     <PaginationItem>
                       <PaginationPrevious 
                         onClick={() => table.previousPage()} 
                         className={cn(
-                          "h-9 px-3 bg-white border-gray-200 hover:bg-gray-50",
+                          "h-8 sm:h-9 px-2 sm:px-3 bg-white border-gray-200 hover:bg-gray-50",
                           !table.getCanPreviousPage() ? "pointer-events-none opacity-50" : ""
                         )}
-                      />
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                        <span className="hidden sm:inline">Previous</span>
+                      </PaginationPrevious>
                     </PaginationItem>
                     
-                    {/* Generate page numbers */}
+                    {/* Generate page numbers - more responsive */}
                     {Array.from({ length: table.getPageCount() }).map((_, i) => {
-                      // Show fewer pages when we have many pages
-                      const showReducedPages = table.getPageCount() > 10;
-                      // Show first page, last page, and pages around current page
+                      // Show fewer pages on mobile
+                      const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+                      const showReducedPages = isMobile || table.getPageCount() > 5;
+                      
+                      // On mobile: show only current page, first and last
+                      // On desktop: show more surrounding pages
                       if (
                         i === 0 || 
                         i === table.getPageCount() - 1 || 
                         (showReducedPages 
-                          ? Math.abs(i - pageIndex) <= 1  // With many pages, only show immediate neighbors
-                          : Math.abs(i - pageIndex) <= 2) // With fewer pages, show more neighbors
+                          ? pageIndex === i // On small screens, only show current
+                          : Math.abs(i - pageIndex) <= 2) // On larger screens, show more
                       ) {
                         return (
-                          <PaginationItem key={i}>
+                          <PaginationItem key={i} className={cn(
+                            // Hide some page numbers on smaller screens if many pages
+                            (showReducedPages && i !== 0 && i !== table.getPageCount() - 1 && i !== pageIndex) ? "hidden sm:inline-flex" : ""
+                          )}>
                             <PaginationLink 
                               onClick={() => table.setPageIndex(i)}
                               isActive={pageIndex === i}
-                              className={cn("h-9 w-9 font-medium", pageIndex === i && "bg-[#4f9eb2] text-white hover:bg-[#4f9eb2]/90")}
+                              className={cn("h-8 sm:h-9 w-8 sm:w-9 font-medium", pageIndex === i && "bg-[#4f9eb2] text-white hover:bg-[#4f9eb2]/90")}
                             >
                               {i + 1}
                             </PaginationLink>
@@ -1691,15 +1713,14 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                       }
                       
                       // Add ellipsis if there's a gap (only add one ellipsis per gap)
+                      // Simplified for mobile view
                       if (
                         (i === 1 && pageIndex > 2) || 
-                        (i === table.getPageCount() - 2 && pageIndex < table.getPageCount() - 3) ||
-                        (i === pageIndex - 2 && i > 1 && showReducedPages) ||
-                        (i === pageIndex + 2 && i < table.getPageCount() - 2 && showReducedPages)
+                        (i === table.getPageCount() - 2 && pageIndex < table.getPageCount() - 3)
                       ) {
                         return (
-                          <PaginationItem key={i}>
-                            <PaginationEllipsis className="h-9 text-[#4f9eb2]" />
+                          <PaginationItem key={i} className="hidden sm:inline-flex">
+                            <PaginationEllipsis className="h-8 sm:h-9 text-[#4f9eb2]" />
                           </PaginationItem>
                         );
                       }
@@ -1711,17 +1732,22 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                       <PaginationNext 
                         onClick={() => table.nextPage()} 
                         className={cn(
-                          "h-9 px-3 bg-white border-gray-200 hover:bg-gray-50",
+                          "h-8 sm:h-9 px-2 sm:px-3 bg-white border-gray-200 hover:bg-gray-50",
                           !table.getCanNextPage() ? "pointer-events-none opacity-50" : ""
                         )}
-                      />
+                      >
+                        <span className="hidden sm:inline">Next</span>
+                        <ChevronRight className="h-4 w-4" />
+                      </PaginationNext>
                     </PaginationItem>
                   </PaginationContent>
                 </Pagination>
 
-                <div className="text-sm font-medium text-gray-600">
-                  {table.getFilteredSelectedRowModel().rows.length} of{" "}
-                  {table.getFilteredRowModel().rows.length} row(s) selected
+                {/* Selected rows count - responsive */}
+                <div className="text-xs sm:text-sm font-medium text-gray-600 order-first sm:order-none">
+                  <span className="hidden sm:inline">{table.getFilteredSelectedRowModel().rows.length} of {" "} 
+                  {table.getFilteredRowModel().rows.length} row(s) selected</span>
+                  <span className="sm:hidden">{table.getFilteredSelectedRowModel().rows.length}/{table.getFilteredRowModel().rows.length} selected</span>
                 </div>
               </div>
             </div>
@@ -2060,20 +2086,23 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
 
         {/* Filters Section */}
         <div className="flex flex-col gap-2 mb-3 px-1">
-          {/* Top Row - Search and Actions */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 w-full max-w-sm">
+          {/* Top Row - Search and Actions - Responsive */}
+          <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+            {/* Search - Full width on mobile, normal on desktop */}
+            <div className="w-full sm:max-w-sm">
               <div className="relative w-full">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
                 <Input
                   placeholder="Search in all columns..."
                   value={globalFilter ?? ""}
                   onChange={(event) => setGlobalFilter(event.target.value)}
-                  className="pl-9 py-2 h-10 bg-white border-gray-200 text-gray-800 placeholder:text-gray-400 focus-visible:ring-[#8370FC] focus-visible:ring-opacity-30 focus-visible:border-[#8370FC] rounded-md"
+                  className="pl-9 py-2 h-10 bg-white border-gray-200 text-gray-800 placeholder:text-gray-400 focus-visible:ring-[#8370FC] focus-visible:ring-opacity-30 focus-visible:border-[#8370FC] rounded-md w-full"
                 />
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            
+            {/* Action Buttons - Row with wrapping */}
+            <div className="flex flex-wrap items-center gap-2 mt-2 sm:mt-0">
               <Button
                 variant="outline"
                 size="sm"
@@ -2084,10 +2113,14 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                   }
                   setIsFilterOpen(true);
                 }}
-                className="text-gray-700 border-gray-200 hover:bg-gray-50 flex items-center gap-2 h-10 rounded-md"
+                className="text-gray-700 border-gray-200 hover:bg-gray-50 flex items-center gap-1.5 h-9 rounded-md text-xs sm:text-sm flex-1 sm:flex-auto justify-center sm:justify-start"
               >
-                <Filter className="h-4 w-4" />
-                Advanced Filters {Object.keys(activeFilters).length > 0 && `(${Object.keys(activeFilters).length})`}
+                <Filter className="h-4 w-4 flex-shrink-0" />
+                <span className="truncate">
+                  {Object.keys(activeFilters).length > 0 
+                    ? `Filters (${Object.keys(activeFilters).length})` 
+                    : "Filters"}
+                </span>
               </Button>
             
               <DropdownMenu>
@@ -2095,10 +2128,10 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                   <Button
                     variant="outline"
                     size="sm"
-                    className="text-gray-700 border-gray-200 hover:bg-gray-50 flex items-center gap-2 h-10 rounded-md"
+                    className="text-gray-700 border-gray-200 hover:bg-gray-50 flex items-center gap-1.5 h-9 rounded-md text-xs sm:text-sm flex-1 sm:flex-auto justify-center sm:justify-start"
                   >
-                    <Eye className="h-4 w-4" />
-                    Columns
+                    <Eye className="h-4 w-4 flex-shrink-0" />
+                    <span className="truncate">Columns</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg rounded-md w-56">
@@ -2206,12 +2239,16 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
               <Button
                 variant="outline"
                 size="sm"
-                className="text-gray-700 border-gray-200 hover:bg-gray-50 flex items-center gap-2 h-10 rounded-md"
+                className="text-gray-700 border-gray-200 hover:bg-gray-50 flex items-center gap-1.5 h-9 rounded-md text-xs sm:text-sm flex-1 sm:flex-auto justify-center sm:justify-start"
                 onClick={handleReviewSelected}
                 disabled={!userData || userData.dataFiles[selectedFileIndex]?.data.length === 0 || exporting}
               >
-                <Download className="h-4 w-4" />
-                Review & Export
+                <Download className="h-4 w-4 flex-shrink-0" />
+                <span className="truncate">
+                  {table.getFilteredSelectedRowModel().rows.length > 0 
+                    ? `Export (${table.getFilteredSelectedRowModel().rows.length})` 
+                    : "Export"}
+                </span>
               </Button>
             </div>
           </div>
@@ -2222,115 +2259,116 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
           <div className="overflow-x-auto">
             <div style={{ width: 'fit-content', minWidth: '100%', maxWidth: 'max-content' }}>
               <Table className="select-none bg-white w-full border-collapse border border-gray-200" style={{ tableLayout: 'auto' }}>
-                <TableHeader>
-                  {table.getHeaderGroups().map((headerGroup) => (
-                    <TableRow 
-                      key={headerGroup.id} 
-                      className="border-none select-none"
-                    >
-                      {headerGroup.headers.map((header, index) => (
-                        <TableHead 
-                          key={header.id} 
-                          className={cn(
-                            "text-white font-medium px-6 py-3 first:rounded-tl-md last:rounded-tr-md select-none text-sm transition-all duration-200",
-                            header.id === "select" && "w-[40px] px-0",
-                            "relative z-10"
-                          )}
-                          style={{ 
-                            width: header.id === "select" ? "40px" : 
-                                  header.id === "Technologies" ? "180px" : 
-                                  header.id === "Industry" || header.id === "industry_client" ? "100px" : 
-                                  header.id === "Country" || header.id === "country_contact_person" ? "100px" : 
-                                  header.id === "email" || header.id === "email_id" ? "160px" : 
-                                  header.id === "website" ? "140px" : "120px",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                            backgroundColor: "#4f9eb2",
-                            borderColor: "#4f9eb2",
-                            borderWidth: "1px",
-                            borderStyle: "solid"
-                          }}
+                    <TableHeader>
+                      {table.getHeaderGroups().map((headerGroup) => (
+                        <TableRow 
+                          key={headerGroup.id} 
+                          className="border-none select-none"
                         >
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
+                          {headerGroup.headers.map((header, index) => (
+                            <TableHead 
+                              key={header.id} 
+                              className={cn(
+                                "text-white font-medium px-6 py-3 first:rounded-tl-md last:rounded-tr-md select-none text-sm transition-all duration-200",
+                                header.id === "select" && "w-[40px] px-0",
+                                "relative z-10"
                               )}
-                        </TableHead>
+                              style={{ 
+                                width: header.id === "select" ? "40px" : 
+                                      header.id === "Technologies" ? "180px" : 
+                                      header.id === "Industry" || header.id === "industry_client" ? "100px" : 
+                                      header.id === "Country" || header.id === "country_contact_person" ? "100px" : 
+                                      header.id === "email" || header.id === "email_id" ? "160px" : 
+                                      header.id === "website" ? "140px" : "120px",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                                backgroundColor: "#4f9eb2",
+                                borderColor: "#4f9eb2",
+                                borderWidth: "1px",
+                                borderStyle: "solid"
+                              }}
+                            >
+                              {header.isPlaceholder
+                                ? null
+                                : flexRender(
+                                    header.column.columnDef.header,
+                                    header.getContext()
+                                  )}
+                            </TableHead>
+                          ))}
+                        </TableRow>
                       ))}
-                    </TableRow>
-                  ))}
-                </TableHeader>
-                <TableBody className="bg-white select-none">
-                  {table.getRowModel().rows?.length ? (
-                    table.getRowModel().rows.map((row, rowIndex) => (
-                      <TableRow
-                        key={row.id}
-                        data-state={row.getIsSelected() && "selected"}
-                        className={cn(
-                          "hover:bg-gray-50/50 cursor-pointer select-none transition-all duration-200",
-                          row.getIsSelected() ? "bg-[#EAE7FF] border-[#8370FC]/30" : "bg-white",
-                          "hover:shadow-sm"
-                        )}
-                        onClick={() => {
-                          setSelectedRow(row.original)
-                          setIsRowDetailsOpen(true)
-                        }}
-                      >
-                        {row.getVisibleCells().map((cell, cellIndex) => (
-                          <TableCell 
-                            key={cell.id} 
+                    </TableHeader>
+                    <TableBody className="bg-white select-none">
+                      {table.getRowModel().rows?.length ? (
+                        table.getRowModel().rows.map((row, rowIndex) => (
+                          <TableRow
+                            key={row.id}
+                            data-state={row.getIsSelected() && "selected"}
                             className={cn(
-                              "text-gray-600 px-6 py-2.5 select-none text-sm transition-all duration-200 border border-gray-200",
-                              cell.column.id === "select" && "pr-0 pl-0 w-[40px] text-center",
-                              row.getIsSelected() && "bg-[#EAE7FF]",
-                              rowIndex === table.getRowModel().rows.length - 1 && cellIndex === 0 && "rounded-bl-md",
-                              rowIndex === table.getRowModel().rows.length - 1 && cellIndex === row.getVisibleCells().length - 1 && "rounded-br-md",
-                              "relative z-0 overflow-hidden"
+                              "hover:bg-gray-50/50 cursor-pointer select-none transition-all duration-200",
+                              row.getIsSelected() ? "bg-[#EAE7FF] border-[#8370FC]/30" : "bg-white",
+                              "hover:shadow-sm"
                             )}
-                            style={{ 
-                              userSelect: 'none', 
-                              WebkitUserSelect: 'none',
-                              width: cell.column.id === "select" ? "40px" : 
-                                    cell.column.id === "Technologies" ? "180px" : 
-                                    cell.column.id === "Industry" || cell.column.id === "industry_client" ? "100px" : 
-                                    cell.column.id === "Country" || cell.column.id === "country_contact_person" ? "100px" : 
-                                    cell.column.id === "email" || cell.column.id === "email_id" ? "160px" : 
-                                    cell.column.id === "website" ? "140px" : "120px",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              whiteSpace: "nowrap",
-                              backgroundColor: row.getIsSelected() ? "#EAE7FF" : "white"
+                            onClick={() => {
+                              setSelectedRow(row.original)
+                              setIsRowDetailsOpen(true)
                             }}
                           >
-                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                            {row.getVisibleCells().map((cell, cellIndex) => (
+                              <TableCell 
+                                key={cell.id} 
+                                className={cn(
+                                  "text-gray-600 px-6 py-2.5 select-none text-sm transition-all duration-200 border border-gray-200",
+                                  cell.column.id === "select" && "pr-0 pl-0 w-[40px] text-center",
+                                  row.getIsSelected() && "bg-[#EAE7FF]",
+                                  rowIndex === table.getRowModel().rows.length - 1 && cellIndex === 0 && "rounded-bl-md",
+                                  rowIndex === table.getRowModel().rows.length - 1 && cellIndex === row.getVisibleCells().length - 1 && "rounded-br-md",
+                                  "relative z-0 overflow-hidden"
+                                )}
+                                style={{ 
+                                  userSelect: 'none', 
+                                  WebkitUserSelect: 'none',
+                                  width: cell.column.id === "select" ? "40px" : 
+                                        cell.column.id === "Technologies" ? "180px" : 
+                                        cell.column.id === "Industry" || cell.column.id === "industry_client" ? "100px" : 
+                                        cell.column.id === "Country" || cell.column.id === "country_contact_person" ? "100px" : 
+                                        cell.column.id === "email" || cell.column.id === "email_id" ? "160px" : 
+                                        cell.column.id === "website" ? "140px" : "120px",
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                  whiteSpace: "nowrap",
+                                  backgroundColor: row.getIsSelected() ? "#EAE7FF" : "white"
+                                }}
+                              >
+                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                        ))
+                      ) : (
+                        <TableRow>
+                          <TableCell
+                            colSpan={columns.length}
+                            className="h-20 text-center text-gray-400 bg-white select-none rounded-b-md border border-gray-200"
+                          >
+                            No results.
                           </TableCell>
-                        ))}
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell
-                        colSpan={columns.length}
-                        className="h-20 text-center text-gray-400 bg-white select-none rounded-b-md border border-gray-200"
-                      >
-                        No results.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
         {/* Pagination */}
-        <div className="flex flex-col gap-4 py-4 px-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <p className="text-sm font-medium text-gray-600">
+            <div className="flex flex-col gap-4 py-4 px-2">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            {/* Rows per page selector - responsive */}
+            <div className="flex items-center space-x-2">
+              <p className="text-sm font-medium text-gray-600 hidden sm:block">
                 Rows per page
               </p>
               <Select
@@ -2339,7 +2377,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                   table.setPageSize(Number(value));
                 }}
               >
-                <SelectTrigger className="h-9 w-[80px]">
+                <SelectTrigger className="h-8 sm:h-9 w-[70px] sm:w-[80px]">
                   <SelectValue placeholder={pageSize} />
                 </SelectTrigger>
                 <SelectContent side="top">
@@ -2352,36 +2390,46 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
               </Select>
             </div>
 
-            <Pagination>
-              <PaginationContent className="gap-2">
+            {/* Pagination - responsive */}
+            <Pagination className="order-last sm:order-none w-full sm:w-auto flex justify-center">
+              <PaginationContent className="gap-1 sm:gap-2">
                 <PaginationItem>
                   <PaginationPrevious 
                     onClick={() => table.previousPage()} 
                     className={cn(
-                      "h-9 px-3 bg-white border-gray-200 hover:bg-gray-50",
+                      "h-8 sm:h-9 px-2 sm:px-3 bg-white border-gray-200 hover:bg-gray-50",
                       !table.getCanPreviousPage() ? "pointer-events-none opacity-50" : ""
                     )}
-                  />
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    <span className="hidden sm:inline">Previous</span>
+                  </PaginationPrevious>
                 </PaginationItem>
                 
-                {/* Generate page numbers */}
+                {/* Generate page numbers - more responsive */}
                 {Array.from({ length: table.getPageCount() }).map((_, i) => {
-                  // Show fewer pages when we have many pages
-                  const showReducedPages = table.getPageCount() > 10;
-                  // Show first page, last page, and pages around current page
+                  // Show fewer pages on mobile
+                  const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+                  const showReducedPages = isMobile || table.getPageCount() > 5;
+                  
+                  // On mobile: show only current page, first and last
+                  // On desktop: show more surrounding pages
                   if (
                     i === 0 || 
                     i === table.getPageCount() - 1 || 
                     (showReducedPages 
-                      ? Math.abs(i - pageIndex) <= 1  // With many pages, only show immediate neighbors
-                      : Math.abs(i - pageIndex) <= 2) // With fewer pages, show more neighbors
+                      ? pageIndex === i // On small screens, only show current
+                      : Math.abs(i - pageIndex) <= 2) // On larger screens, show more
                   ) {
                     return (
-                      <PaginationItem key={i}>
+                      <PaginationItem key={i} className={cn(
+                        // Hide some page numbers on smaller screens if many pages
+                        (showReducedPages && i !== 0 && i !== table.getPageCount() - 1 && i !== pageIndex) ? "hidden sm:inline-flex" : ""
+                      )}>
                         <PaginationLink 
                           onClick={() => table.setPageIndex(i)}
                           isActive={pageIndex === i}
-                          className={cn("h-9 w-9 font-medium", pageIndex === i && "bg-[#4f9eb2] text-white hover:bg-[#4f9eb2]/90")}
+                          className={cn("h-8 sm:h-9 w-8 sm:w-9 font-medium", pageIndex === i && "bg-[#4f9eb2] text-white hover:bg-[#4f9eb2]/90")}
                         >
                           {i + 1}
                         </PaginationLink>
@@ -2390,15 +2438,14 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                   }
                   
                   // Add ellipsis if there's a gap (only add one ellipsis per gap)
+                  // Simplified for mobile view
                   if (
                     (i === 1 && pageIndex > 2) || 
-                    (i === table.getPageCount() - 2 && pageIndex < table.getPageCount() - 3) ||
-                    (i === pageIndex - 2 && i > 1 && showReducedPages) ||
-                    (i === pageIndex + 2 && i < table.getPageCount() - 2 && showReducedPages)
+                    (i === table.getPageCount() - 2 && pageIndex < table.getPageCount() - 3)
                   ) {
                     return (
-                      <PaginationItem key={i}>
-                        <PaginationEllipsis className="h-9 text-[#4f9eb2]" />
+                      <PaginationItem key={i} className="hidden sm:inline-flex">
+                        <PaginationEllipsis className="h-8 sm:h-9 text-[#4f9eb2]" />
                       </PaginationItem>
                     );
                   }
@@ -2410,17 +2457,22 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                   <PaginationNext 
                     onClick={() => table.nextPage()} 
                     className={cn(
-                      "h-9 px-3 bg-white border-gray-200 hover:bg-gray-50",
+                      "h-8 sm:h-9 px-2 sm:px-3 bg-white border-gray-200 hover:bg-gray-50",
                       !table.getCanNextPage() ? "pointer-events-none opacity-50" : ""
                     )}
-                  />
+                  >
+                    <span className="hidden sm:inline">Next</span>
+                    <ChevronRight className="h-4 w-4" />
+                  </PaginationNext>
                 </PaginationItem>
               </PaginationContent>
             </Pagination>
 
-            <div className="text-sm font-medium text-gray-600">
-              {table.getFilteredSelectedRowModel().rows.length} of{" "}
-              {table.getFilteredRowModel().rows.length} row(s) selected
+            {/* Selected rows count - responsive */}
+            <div className="text-xs sm:text-sm font-medium text-gray-600 order-first sm:order-none">
+              <span className="hidden sm:inline">{table.getFilteredSelectedRowModel().rows.length} of {" "} 
+              {table.getFilteredRowModel().rows.length} row(s) selected</span>
+              <span className="sm:hidden">{table.getFilteredSelectedRowModel().rows.length}/{table.getFilteredRowModel().rows.length} selected</span>
             </div>
           </div>
         </div>

@@ -52,6 +52,23 @@ export default function DashboardPage() {
   const [showAllRevenues, setShowAllRevenues] = useState(false)
   const [selectedIndustryIndex, setSelectedIndustryIndex] = useState<number | null>(null)
   const [selectedCountryIndex, setSelectedCountryIndex] = useState<number | null>(null)
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Handle responsive sizing
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    
+    // Check on initial load
+    checkMobile()
+    
+    // Add resize listener
+    window.addEventListener('resize', checkMobile)
+    
+    // Clean up
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   const fetchUserData = async () => {
     try {
@@ -443,13 +460,13 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="space-y-6 p-6 bg-white min-h-screen">
+    <div className="space-y-6 p-2 sm:p-6 bg-white min-h-screen">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
+        <h1 className="text-2xl pl-12 sm:pl-0 sm:text-3xl font-bold text-gray-800">Dashboard</h1>
       </div>
       
       {/* Top Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         <Card className="group bg-[#f0f7ff] rounded-xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_20px_-3px_rgba(0,0,0,0.1),0_15px_25px_-2px_rgba(0,0,0,0.05)] transition-all duration-300 border-2 border-[#d2e3fc] hover:border-[#78b3fb] hover:-translate-y-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-800 group-hover:text-[#1a1f2e] transition-colors">Total Files</CardTitle>
@@ -462,6 +479,7 @@ export default function DashboardPage() {
             <p className="text-xs text-gray-600 group-hover:text-gray-700 transition-colors">Files in your database</p>
           </CardContent>
         </Card>
+        
         <Card className="group bg-[#f0fff9] rounded-xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_20px_-3px_rgba(0,0,0,0.1),0_15px_25px_-2px_rgba(0,0,0,0.05)] transition-all duration-300 border-2 border-[#d0f5e8] hover:border-[#4ECDC4] hover:-translate-y-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-800 group-hover:text-[#1a1f2e] transition-colors">Total Records</CardTitle>
@@ -474,6 +492,7 @@ export default function DashboardPage() {
             <p className="text-xs text-gray-600 group-hover:text-gray-700 transition-colors">Total records across all files</p>
           </CardContent>
         </Card>
+        
         <Card className="group bg-gradient-to-r from-[#ffec99] via-[#fff8cc] to-[#ffec99] rounded-xl shadow-[0_2px_15px_-3px_rgba(255,215,0,0.15),0_10px_20px_-2px_rgba(255,215,0,0.1)] hover:shadow-[0_8px_25px_-5px_rgba(255,215,0,0.3),0_15px_25px_-2px_rgba(255,215,0,0.2)] transition-all duration-300 border-2 border-[#ffd700] hover:border-[#ffbd00] hover:-translate-y-1 relative overflow-hidden">
           <div className="absolute inset-0 bg-[url('/sparkle.svg')] opacity-10"></div>
           <div className="absolute -right-6 -top-6 h-16 w-16 bg-yellow-300 rounded-full opacity-40 blur-xl"></div>
@@ -490,6 +509,7 @@ export default function DashboardPage() {
             <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-yellow-400 to-transparent mt-3 opacity-50"></div>
           </CardContent>
         </Card>
+        
         <Card className="group bg-[#fff5f2] rounded-xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_20px_-3px_rgba(0,0,0,0.1),0_15px_25px_-2px_rgba(0,0,0,0.05)] transition-all duration-300 border-2 border-[#ffe5e0] hover:border-[#ff9d92] hover:-translate-y-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-800 group-hover:text-[#1a1f2e] transition-colors">Total Emails</CardTitle>
@@ -502,6 +522,7 @@ export default function DashboardPage() {
             <p className="text-xs text-gray-600 group-hover:text-gray-700 transition-colors">Total email addresses in database</p>
           </CardContent>
         </Card>
+        
         <Card className="group bg-[#f6f0ff] rounded-xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_20px_-3px_rgba(0,0,0,0.1),0_15px_25px_-2px_rgba(0,0,0,0.05)] transition-all duration-300 border-2 border-[#eae0ff] hover:border-[#c8b3ff] hover:-translate-y-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-800 group-hover:text-[#1a1f2e] transition-colors">Total Phone Numbers</CardTitle>
@@ -514,6 +535,7 @@ export default function DashboardPage() {
             <p className="text-xs text-gray-600 group-hover:text-gray-700 transition-colors">Total phone numbers in database</p>
           </CardContent>
         </Card>
+        
         <Card className="group bg-[#fff0f8] rounded-xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_20px_-3px_rgba(0,0,0,0.1),0_15px_25px_-2px_rgba(0,0,0,0.05)] transition-all duration-300 border-2 border-[#ffd0e8] hover:border-[#ff9ed0] hover:-translate-y-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-800 group-hover:text-[#1a1f2e] transition-colors">Data Requests</CardTitle>
@@ -529,21 +551,21 @@ export default function DashboardPage() {
       </div>
 
       {/* Analytics Charts */}
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 grid-cols-1">
         {/* Title and Revenue Distribution */}
-        <div className="col-span-2 grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Title Distribution */}
           <Card className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-slate-200">
             <CardHeader>
-              <CardTitle className="text-slate-800 font-semibold">Title Distribution</CardTitle>
+              <CardTitle className="text-lg text-slate-800 font-semibold">Title Distribution</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-[420px] w-full">
+              <div className="h-[300px] sm:h-[420px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart 
                     data={getTop8Titles()}
                     layout="vertical"
-                    margin={{ top: 20, right: 80, left: 0, bottom: 20 }}
+                    margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
                     barSize={20}
                     maxBarSize={100}
                     onClick={() => setShowAllTitles(true)}
@@ -555,12 +577,12 @@ export default function DashboardPage() {
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" horizontal={true} vertical={false} />
-                    <XAxis type="number" tick={{ fill: '#475569', fontSize: 12 }} />
+                    <XAxis type="number" tick={{ fill: '#475569', fontSize: 11 }} />
                     <YAxis 
                       dataKey="name" 
                       type="category"
-                      width={170}
-                      tick={{ fill: '#475569', fontSize: 12 }}
+                      width={120}
+                      tick={{ fill: '#475569', fontSize: 10 }}
                     />
                     <Tooltip 
                       formatter={(value: number) => [`Count: ${value}`, 'Total']}
@@ -594,18 +616,18 @@ export default function DashboardPage() {
           {/* Revenue Distribution */}
           <Card className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-slate-200">
             <CardHeader>
-              <CardTitle className="text-slate-800 font-semibold">Revenue Distribution</CardTitle>
+              <CardTitle className="text-lg text-slate-800 font-semibold">Revenue Distribution</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-[400px]">
+              <div className="h-[300px] sm:h-[400px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
                       data={getDetailedRevenueDistribution()}
                       cx="50%"
                       cy="50%"
-                      innerRadius={90}
-                      outerRadius={120}
+                      innerRadius={isMobile ? 40 : 60}
+                      outerRadius={isMobile ? 70 : 90}
                       paddingAngle={2}
                       cornerRadius={8}
                       dataKey="value"
@@ -619,6 +641,9 @@ export default function DashboardPage() {
                         value,
                         index,
                       }) => {
+                        // Don't show labels on small screens
+                        if (isMobile) return null;
+                        
                         const RADIAN = Math.PI / 180;
                         const radius = 25 + innerRadius + (outerRadius - innerRadius);
                         const x = cx + radius * Math.cos(-midAngle * RADIAN);
@@ -633,7 +658,7 @@ export default function DashboardPage() {
                             style={{
                               fill: '#475569',
                               color: '#475569',
-                              fontSize: 14,
+                              fontSize: 12,
                               fontWeight: 500,
                               paintOrder: 'stroke',
                               stroke: 'white',
@@ -669,7 +694,8 @@ export default function DashboardPage() {
                       verticalAlign="bottom" 
                       align="center"
                       wrapperStyle={{
-                        paddingTop: '20px'
+                        fontSize: 10,
+                        paddingTop: '10px'
                       }}
                     />
                   </PieChart>
@@ -680,14 +706,14 @@ export default function DashboardPage() {
         </div>
 
         {/* Industry and Country Distribution */}
-        <div className="col-span-2 grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Industry Distribution */}
           <Card className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-slate-200">
             <CardHeader>
-              <CardTitle className="text-slate-800 font-semibold">Industry Distribution</CardTitle>
+              <CardTitle className="text-lg text-slate-800 font-semibold">Industry Distribution</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-[400px]">
+              <div className="h-[300px] sm:h-[400px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <defs>
@@ -702,12 +728,15 @@ export default function DashboardPage() {
                       data={getTop8Industries()}
                       cx="50%"
                       cy="50%"
-                      innerRadius={90}
-                      outerRadius={120}
+                      innerRadius={isMobile ? 40 : 60}
+                      outerRadius={isMobile ? 70 : 90}
                       paddingAngle={2}
                       cornerRadius={8}
                       dataKey="value"
                       label={({ cx, cy, midAngle, innerRadius, outerRadius, value, index }) => {
+                        // For mobile, don't show labels for small screens
+                        if (isMobile) return null;
+
                         const RADIAN = Math.PI / 180;
                         const radius = 25 + innerRadius + (outerRadius - innerRadius);
                         const x = cx + radius * Math.cos(-midAngle * RADIAN);
@@ -721,7 +750,7 @@ export default function DashboardPage() {
                             style={{
                               fill: '#475569',
                               color: '#475569',
-                              fontSize: 14,
+                              fontSize: 12,
                               fontWeight: 500,
                               paintOrder: 'stroke',
                               stroke: 'white',
@@ -760,7 +789,8 @@ export default function DashboardPage() {
                       verticalAlign="bottom" 
                       align="center"
                       wrapperStyle={{
-                        paddingTop: '20px'
+                        fontSize: 10,
+                        paddingTop: '10px'
                       }}
                     />
                   </PieChart>
@@ -772,10 +802,10 @@ export default function DashboardPage() {
           {/* Country Distribution */}
           <Card className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-slate-200">
             <CardHeader>
-              <CardTitle className="text-slate-800 font-semibold">Country Distribution</CardTitle>
+              <CardTitle className="text-lg text-slate-800 font-semibold">Country Distribution</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-[400px]">
+              <div className="h-[300px] sm:h-[400px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <defs>
@@ -790,12 +820,15 @@ export default function DashboardPage() {
                       data={getTop8Countries()}
                       cx="50%"
                       cy="50%"
-                      innerRadius={90}
-                      outerRadius={120}
+                      innerRadius={isMobile ? 40 : 60}
+                      outerRadius={isMobile ? 70 : 90}
                       paddingAngle={2}
                       cornerRadius={8}
                       dataKey="value"
                       label={({ cx, cy, midAngle, innerRadius, outerRadius, value, index }) => {
+                        // For mobile, don't show labels for small screens
+                        if (isMobile) return null;
+
                         const RADIAN = Math.PI / 180;
                         const radius = 25 + innerRadius + (outerRadius - innerRadius);
                         const x = cx + radius * Math.cos(-midAngle * RADIAN);
@@ -809,7 +842,7 @@ export default function DashboardPage() {
                             style={{
                               fill: '#475569',
                               color: '#475569',
-                              fontSize: 14,
+                              fontSize: 12,
                               fontWeight: 500,
                               paintOrder: 'stroke',
                               stroke: 'white',
@@ -848,7 +881,8 @@ export default function DashboardPage() {
                       verticalAlign="bottom" 
                       align="center"
                       wrapperStyle={{
-                        paddingTop: '20px'
+                        fontSize: 10,
+                        paddingTop: '10px'
                       }}
                     />
                   </PieChart>
@@ -858,111 +892,19 @@ export default function DashboardPage() {
           </Card>
         </div>
 
-        {/* All Industries Modal */}
-        <Dialog open={showAllIndustries} onOpenChange={(open) => { setShowAllIndustries(open); if (!open) setSelectedIndustryIndex(null); }}>
-          <DialogContent className="max-w-[90vw] w-[800px] h-[80vh]">
-            <DialogHeader>
-              <DialogTitle>All Industries Distribution</DialogTitle>
-            </DialogHeader>
-            <div className="h-[calc(80vh-100px)] overflow-auto">
-              <ResponsiveContainer width="100%" height={Math.max(600, (userData?.fileAnalytics.industries.length || 0) * 40)}>
-                <BarChart 
-                  data={userData?.fileAnalytics.industries}
-                  layout="vertical"
-                  margin={{ top: 20, right: 30, left: 90, bottom: 20 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis 
-                    type="number"
-                    tick={{ fontSize: 12 }}
-                  />
-                  <YAxis 
-                    dataKey="name" 
-                    type="category"
-                    width={110}
-                    tick={{ fontSize: 12 }}
-                  />
-                  <Tooltip 
-                    formatter={(value: number) => [`Count: ${value}`, 'Total']}
-                    labelStyle={{ color: 'black' }}
-                  />
-                  <Bar
-                    dataKey="value"
-                    radius={[0, 4, 4, 0]}
-                    maxBarSize={20}
-                  >
-                    {userData?.fileAnalytics.industries.map((entry, index) => (
-                      <Cell 
-                        key={`cell-${index}`} 
-                        fill={selectedIndustryIndex !== null ? COLORS[selectedIndustryIndex % COLORS.length] : COLORS[index % COLORS.length]}
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* All Countries Modal */}
-        <Dialog open={showAllCountries} onOpenChange={(open) => { setShowAllCountries(open); if (!open) setSelectedCountryIndex(null); }}>
-          <DialogContent className="max-w-[90vw] w-[800px] h-[80vh]">
-            <DialogHeader>
-              <DialogTitle>All Countries Distribution</DialogTitle>
-            </DialogHeader>
-            <div className="h-[calc(80vh-100px)] overflow-auto">
-              <ResponsiveContainer width="100%" height={Math.max(600, (userData?.fileAnalytics.countries.length || 0) * 40)}>
-                <BarChart 
-                  data={userData?.fileAnalytics.countries}
-                  layout="vertical"
-                  margin={{ top: 20, right: 30, left: 90, bottom: 20 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis 
-                    type="number"
-                    tick={{ fontSize: 12 }}
-                  />
-                  <YAxis 
-                    dataKey="name" 
-                    type="category"
-                    width={170}
-                    tick={{ fontSize: 12 }}
-                  />
-                  <Tooltip 
-                    formatter={(value: number) => [`Count: ${value}`, 'Total']}
-                    labelStyle={{ color: 'black' }}
-                  />
-                  <Bar
-                    dataKey="value"
-                    radius={[0, 4, 4, 0]}
-                    maxBarSize={20}
-                  >
-                    {userData?.fileAnalytics.countries.map((entry, index) => (
-                      <Cell 
-                        key={`cell-${index}`} 
-                        fill={selectedCountryIndex !== null ? COUNTRY_COLORS[selectedCountryIndex % COUNTRY_COLORS.length] : COUNTRY_COLORS[index % COUNTRY_COLORS.length]}
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </DialogContent>
-        </Dialog>
-
         {/* Technology and Employee Size Distribution */}
-        <div className="col-span-2 grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Technology Distribution */}
           <Card className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-slate-200">
             <CardHeader>
-              <CardTitle className="text-slate-800 font-semibold">Technology Distribution</CardTitle>
+              <CardTitle className="text-lg text-slate-800 font-semibold">Technology Distribution</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-[400px]">
+              <div className="h-[300px] sm:h-[400px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart 
                     data={getTop10Technologies()}
-                    margin={{ top: 20, right: 30, left: 10, bottom: 50 }}
+                    margin={{ top: 20, right: 10, left: 0, bottom: isMobile ? 80 : 60 }}
                     onClick={() => setShowAllTechnologies(true)}
                   >
                     <defs>
@@ -974,15 +916,15 @@ export default function DashboardPage() {
                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                     <XAxis 
                       dataKey="name"
-                      angle={-60}
+                      angle={-70}
                       textAnchor="end"
-                      height={50}
+                      height={60}
                       interval={0}
-                      tick={{ fill: '#475569', fontSize: 11 }}
+                      tick={{ fill: '#475569', fontSize: isMobile ? 8 : 10 }}
                       tickLine={{ stroke: '#cbd5e1' }}
                     />
                     <YAxis 
-                      tick={{ fill: '#475569', fontSize: 12 }}
+                      tick={{ fill: '#475569', fontSize: isMobile ? 9 : 11 }}
                       tickLine={{ stroke: '#cbd5e1' }}
                     />
                     <Tooltip 
@@ -1000,7 +942,7 @@ export default function DashboardPage() {
                       fill="url(#techGradient)"
                       radius={[4, 4, 0, 0]}
                       cursor="pointer"
-                      maxBarSize={25}
+                      maxBarSize={isMobile ? 15 : 25}
                     >
                       {getTop10Technologies().map((entry, index) => (
                         <Cell 
@@ -1018,16 +960,16 @@ export default function DashboardPage() {
           {/* Employee Size Distribution */}
           <Card className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-slate-200">
             <CardHeader>
-              <CardTitle className="text-slate-800 font-semibold">Employee Size Distribution</CardTitle>
+              <CardTitle className="text-lg text-slate-800 font-semibold">Employee Size Distribution</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-[400px]">
+              <div className="h-[300px] sm:h-[400px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart 
                     data={getDetailedEmployeeSizeDistribution()}
                     layout="vertical"
-                    margin={{ top: 20, right: 50, left: 10, bottom: 20 }}
-                    barSize={30}
+                    margin={{ top: 20, right: 30, left: 0, bottom: 20 }}
+                    barSize={isMobile ? 15 : 20}
                     onClick={() => setShowAllEmployeeSizes(true)}
                   >
                     <defs>
@@ -1037,12 +979,12 @@ export default function DashboardPage() {
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" horizontal={true} vertical={false} />
-                    <XAxis type="number" tick={{ fill: '#475569', fontSize: 12 }} />
+                    <XAxis type="number" tick={{ fill: '#475569', fontSize: isMobile ? 9 : 11 }} />
                     <YAxis 
                       dataKey="name" 
                       type="category"
-                      width={100}
-                      tick={{ fill: '#475569', fontSize: 12 }}
+                      width={isMobile ? 60 : 80}
+                      tick={{ fill: '#475569', fontSize: isMobile ? 9 : 11 }}
                     />
                     <Tooltip 
                       formatter={(value: number) => [`Companies: ${value}`, 'Total']}
@@ -1073,247 +1015,339 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         </div>
-
-        {/* All Technologies Modal */}
-        <Dialog open={showAllTechnologies} onOpenChange={setShowAllTechnologies}>
-          <DialogContent className="max-w-[90vw] w-[800px] h-[80vh] bg-gradient-to-br from-slate-50 to-slate-100/50 border border-slate-200">
-            <DialogHeader>
-              <DialogTitle className="text-slate-800 font-semibold">All Technologies Distribution</DialogTitle>
-            </DialogHeader>
-            <div className="h-[calc(80vh-100px)] overflow-auto">
-              <ResponsiveContainer width="100%" height={Math.max(600, (userData?.fileAnalytics.technologies.length || 0) * 40)}>
-                <BarChart 
-                  data={userData?.fileAnalytics.technologies}
-                  layout="vertical"
-                  margin={{ top: 20, right: 30, left: 10, bottom: 20 }}
-                >
-                  <defs>
-                    <linearGradient id="allTechGradient" x1="0" y1="0" x2="1" y2="0">
-                      <stop offset="5%" stopColor="#78b3fb" stopOpacity={0.8}/>
-                      <stop offset="95%" stopColor="#78b3fb" stopOpacity={0.9}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                  <XAxis 
-                    type="number"
-                    tick={{ fill: '#475569', fontSize: 12 }}
-                    tickLine={{ stroke: '#cbd5e1' }}
-                  />
-                  <YAxis 
-                    dataKey="name" 
-                    type="category"
-                    width={150}
-                    tick={{ fill: '#475569', fontSize: 12 }}
-                    tickLine={{ stroke: '#cbd5e1' }}
-                  />
-                  <Tooltip 
-                    formatter={(value: number) => [`Count: ${value}`, 'Total']}
-                    labelStyle={{ color: '#1e293b', fontWeight: 600 }}
-                    contentStyle={{ 
-                      backgroundColor: 'white',
-                      border: '1px solid #e2e8f0',
-                      borderRadius: '8px',
-                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
-                    }}
-                  />
-                  <Bar
-                    dataKey="value"
-                    fill="url(#allTechGradient)"
-                    radius={[0, 4, 4, 0]}
-                    maxBarSize={20}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* All Employee Sizes Modal */}
-        <Dialog open={showAllEmployeeSizes} onOpenChange={setShowAllEmployeeSizes}>
-          <DialogContent className="max-w-[90vw] w-[800px] h-[80vh] bg-gradient-to-br from-slate-50 to-slate-100/50 border border-slate-200">
-            <DialogHeader>
-              <DialogTitle className="text-slate-800 font-semibold">All Employee Size Distribution</DialogTitle>
-            </DialogHeader>
-            <div className="h-[calc(80vh-100px)] overflow-auto">
-              <ResponsiveContainer width="100%" height={600}>
-                <BarChart 
-                  data={getDetailedEmployeeSizeDistribution()}
-                  layout="vertical"
-                  margin={{ top: 20, right: 50, left: 10, bottom: 20 }}
-                  barSize={30}
-                >
-                  <defs>
-                    <linearGradient id="allEmployeeGradient" x1="0" y1="0" x2="1" y2="0">
-                      <stop offset="5%" stopColor="#78b3fb" stopOpacity={0.8}/>
-                      <stop offset="95%" stopColor="#78b3fb" stopOpacity={0.9}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                  <XAxis 
-                    type="number"
-                    tick={{ fill: '#475569', fontSize: 12 }}
-                    tickLine={{ stroke: '#cbd5e1' }}
-                  />
-                  <YAxis 
-                    dataKey="name" 
-                    type="category"
-                    width={150}
-                    tick={{ fill: '#475569', fontSize: 12 }}
-                    tickLine={{ stroke: '#cbd5e1' }}
-                  />
-                  <Tooltip 
-                    formatter={(value: number) => [`Companies: ${value}`, 'Total']}
-                    labelStyle={{ color: '#1e293b', fontWeight: 600 }}
-                    contentStyle={{ 
-                      backgroundColor: 'white',
-                      border: '1px solid #e2e8f0',
-                      borderRadius: '8px',
-                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
-                    }}
-                  />
-                  <Bar
-                    dataKey="value"
-                    fill="url(#allEmployeeGradient)"
-                    radius={[0, 4, 4, 0]}
-                    cursor="pointer"
-                  >
-                    {getDetailedEmployeeSizeDistribution().map((entry, index) => (
-                      <Cell 
-                        key={`cell-${index}`} 
-                        fill="url(#allEmployeeGradient)"
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* All Revenue Distribution Modal */}
-        <Dialog open={showAllRevenues} onOpenChange={setShowAllRevenues}>
-          <DialogContent className="max-w-[90vw] w-[800px] h-[80vh] bg-gradient-to-br from-slate-50 to-slate-100/50 border border-slate-200">
-            <DialogHeader>
-              <DialogTitle className="text-slate-800 font-semibold">All Revenue Distribution</DialogTitle>
-            </DialogHeader>
-            <div className="h-[calc(80vh-100px)] overflow-auto">
-              <ResponsiveContainer width="100%" height={600}>
-                <BarChart 
-                  data={getDetailedRevenueDistribution()}
-                  layout="vertical"
-                  margin={{ top: 20, right: 50, left: 10, bottom: 20 }}
-                  barSize={30}
-                >
-                  <defs>
-                    <linearGradient id="allRevenueGradient" x1="0" y1="0" x2="1" y2="0">
-                      <stop offset="5%" stopColor="#F06292" stopOpacity={0.8}/>
-                      <stop offset="95%" stopColor="#F06292" stopOpacity={0.9}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                  <XAxis 
-                    type="number"
-                    tick={{ fill: '#475569', fontSize: 12 }}
-                    tickLine={{ stroke: '#cbd5e1' }}
-                  />
-                  <YAxis 
-                    dataKey="name" 
-                    type="category"
-                    width={150}
-                    tick={{ fill: '#475569', fontSize: 12 }}
-                    tickLine={{ stroke: '#cbd5e1' }}
-                  />
-                  <Tooltip 
-                    formatter={(value: number) => [`Companies: ${value}`, 'Total']}
-                    labelStyle={{ color: '#1e293b', fontWeight: 600 }}
-                    contentStyle={{ 
-                      backgroundColor: 'white',
-                      border: '1px solid #e2e8f0',
-                      borderRadius: '8px',
-                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
-                    }}
-                  />
-                  <Bar
-                    dataKey="value"
-                    fill="url(#allRevenueGradient)"
-                    radius={[0, 4, 4, 0]}
-                    cursor="pointer"
-                  >
-                    {getDetailedRevenueDistribution().map((entry, index) => (
-                      <Cell 
-                        key={`cell-${index}`} 
-                        fill={REVENUE_COLORS[index % REVENUE_COLORS.length]}
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* All Titles Modal */}
-        <Dialog open={showAllTitles} onOpenChange={setShowAllTitles}>
-          <DialogContent className="max-w-[90vw] w-[800px] h-[80vh] bg-gradient-to-br from-slate-50 to-slate-100/50 border border-slate-200">
-            <DialogHeader>
-              <DialogTitle className="text-slate-800 font-semibold">All Titles Distribution</DialogTitle>
-            </DialogHeader>
-            <div className="h-[calc(80vh-100px)] overflow-auto">
-              <ResponsiveContainer width="100%" height={Math.max(600, (userData?.fileAnalytics.titleDistribution.length || 0) * 40)}>
-                <BarChart 
-                  data={userData?.fileAnalytics.titleDistribution}
-                  layout="vertical"
-                  margin={{ top: 20, right: 80, left: 10, bottom: 20 }}
-                  barSize={30}
-                >
-                  <defs>
-                    <linearGradient id="allTitlesGradient" x1="0" y1="0" x2="1" y2="0">
-                      <stop offset="5%" stopColor="#78b3fb" stopOpacity={0.8}/>
-                      <stop offset="95%" stopColor="#78b3fb" stopOpacity={0.9}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                  <XAxis 
-                    type="number"
-                    tick={{ fill: '#475569', fontSize: 12 }}
-                    tickLine={{ stroke: '#cbd5e1' }}
-                  />
-                  <YAxis 
-                    dataKey="name" 
-                    type="category"
-                    width={170}
-                    tick={{ fill: '#475569', fontSize: 12 }}
-                    tickLine={{ stroke: '#cbd5e1' }}
-                  />
-                  <Tooltip 
-                    formatter={(value: number) => [`Count: ${value}`, 'Total']}
-                    labelStyle={{ color: '#1e293b', fontWeight: 600 }}
-                    contentStyle={{ 
-                      backgroundColor: 'white',
-                      border: '1px solid #e2e8f0',
-                      borderRadius: '8px',
-                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
-                    }}
-                  />
-                  <Bar
-                    dataKey="count"
-                    fill="url(#allTitlesGradient)"
-                    radius={[0, 4, 4, 0]}
-                    maxBarSize={20}
-                  >
-                    {userData?.fileAnalytics.titleDistribution.map((entry, index) => (
-                      <Cell 
-                        key={`cell-${index}`} 
-                        fill="url(#allTitlesGradient)"
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </DialogContent>
-        </Dialog>
       </div>
+
+      {/* All Industries Modal */}
+      <Dialog open={showAllIndustries} onOpenChange={(open) => { setShowAllIndustries(open); if (!open) setSelectedIndustryIndex(null); }}>
+        <DialogContent className="max-w-[95vw] w-full md:w-[800px] h-[80vh] max-h-[90vh] overflow-hidden">
+          <DialogHeader>
+            <DialogTitle>All Industries Distribution</DialogTitle>
+          </DialogHeader>
+          <div className="h-[calc(80vh-100px)] overflow-auto">
+            <ResponsiveContainer width="100%" height={Math.max(400, (userData?.fileAnalytics.industries.length || 0) * 40)}>
+              <BarChart 
+                data={userData?.fileAnalytics.industries}
+                layout="vertical"
+                margin={{ top: 20, right: 30, left: 90, bottom: 20 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis 
+                  type="number"
+                  tick={{ fontSize: 10 }}
+                />
+                <YAxis 
+                  dataKey="name" 
+                  type="category"
+                  width={80}
+                  tick={{ fontSize: 10 }}
+                />
+                <Tooltip 
+                  formatter={(value: number) => [`Count: ${value}`, 'Total']}
+                  labelStyle={{ color: 'black' }}
+                />
+                <Bar
+                  dataKey="value"
+                  radius={[0, 4, 4, 0]}
+                  maxBarSize={20}
+                >
+                  {userData?.fileAnalytics.industries.map((entry, index) => (
+                    <Cell 
+                      key={`cell-${index}`} 
+                      fill={selectedIndustryIndex !== null ? COLORS[selectedIndustryIndex % COLORS.length] : COLORS[index % COLORS.length]}
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* All Countries Modal */}
+      <Dialog open={showAllCountries} onOpenChange={(open) => { setShowAllCountries(open); if (!open) setSelectedCountryIndex(null); }}>
+        <DialogContent className="max-w-[95vw] w-full md:w-[800px] h-[80vh] max-h-[90vh] overflow-hidden">
+          <DialogHeader>
+            <DialogTitle>All Countries Distribution</DialogTitle>
+          </DialogHeader>
+          <div className="h-[calc(80vh-100px)] overflow-auto">
+            <ResponsiveContainer width="100%" height={Math.max(400, (userData?.fileAnalytics.countries.length || 0) * 40)}>
+              <BarChart 
+                data={userData?.fileAnalytics.countries}
+                layout="vertical"
+                margin={{ top: 20, right: 30, left: 80, bottom: 20 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis 
+                  type="number"
+                  tick={{ fontSize: 10 }}
+                />
+                <YAxis 
+                  dataKey="name" 
+                  type="category"
+                  width={80}
+                  tick={{ fontSize: 10 }}
+                />
+                <Tooltip 
+                  formatter={(value: number) => [`Count: ${value}`, 'Total']}
+                  labelStyle={{ color: 'black' }}
+                />
+                <Bar
+                  dataKey="value"
+                  radius={[0, 4, 4, 0]}
+                  maxBarSize={20}
+                >
+                  {userData?.fileAnalytics.countries.map((entry, index) => (
+                    <Cell 
+                      key={`cell-${index}`} 
+                      fill={selectedCountryIndex !== null ? COUNTRY_COLORS[selectedCountryIndex % COUNTRY_COLORS.length] : COUNTRY_COLORS[index % COUNTRY_COLORS.length]}
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* All Technologies Modal */}
+      <Dialog open={showAllTechnologies} onOpenChange={setShowAllTechnologies}>
+        <DialogContent className="max-w-[95vw] w-full md:w-[800px] h-[80vh] max-h-[90vh] overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100/50 border border-slate-200">
+          <DialogHeader>
+            <DialogTitle className="text-slate-800 font-semibold">All Technologies Distribution</DialogTitle>
+          </DialogHeader>
+          <div className="h-[calc(80vh-100px)] overflow-auto">
+            <ResponsiveContainer width="100%" height={Math.max(400, (userData?.fileAnalytics.technologies.length || 0) * 40)}>
+              <BarChart 
+                data={userData?.fileAnalytics.technologies}
+                layout="vertical"
+                margin={{ top: 20, right: 30, left: 10, bottom: 20 }}
+              >
+                <defs>
+                  <linearGradient id="allTechGradient" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="5%" stopColor="#78b3fb" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#78b3fb" stopOpacity={0.9}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis 
+                  type="number"
+                  tick={{ fill: '#475569', fontSize: 10 }}
+                  tickLine={{ stroke: '#cbd5e1' }}
+                />
+                <YAxis 
+                  dataKey="name" 
+                  type="category"
+                  width={120}
+                  tick={{ fill: '#475569', fontSize: 10 }}
+                  tickLine={{ stroke: '#cbd5e1' }}
+                />
+                <Tooltip 
+                  formatter={(value: number) => [`Count: ${value}`, 'Total']}
+                  labelStyle={{ color: '#1e293b', fontWeight: 600 }}
+                  contentStyle={{ 
+                    backgroundColor: 'white',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+                  }}
+                />
+                <Bar
+                  dataKey="value"
+                  fill="url(#allTechGradient)"
+                  radius={[0, 4, 4, 0]}
+                  maxBarSize={20}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* All Employee Sizes Modal */}
+      <Dialog open={showAllEmployeeSizes} onOpenChange={setShowAllEmployeeSizes}>
+        <DialogContent className="max-w-[95vw] w-full md:w-[800px] h-[80vh] max-h-[90vh] overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100/50 border border-slate-200">
+          <DialogHeader>
+            <DialogTitle className="text-slate-800 font-semibold">All Employee Size Distribution</DialogTitle>
+          </DialogHeader>
+          <div className="h-[calc(80vh-100px)] overflow-auto">
+            <ResponsiveContainer width="100%" height={500}>
+              <BarChart 
+                data={getDetailedEmployeeSizeDistribution()}
+                layout="vertical"
+                margin={{ top: 20, right: 30, left: 10, bottom: 20 }}
+                barSize={25}
+              >
+                <defs>
+                  <linearGradient id="allEmployeeGradient" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="5%" stopColor="#78b3fb" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#78b3fb" stopOpacity={0.9}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis 
+                  type="number"
+                  tick={{ fill: '#475569', fontSize: 10 }}
+                  tickLine={{ stroke: '#cbd5e1' }}
+                />
+                <YAxis 
+                  dataKey="name" 
+                  type="category"
+                  width={80}
+                  tick={{ fill: '#475569', fontSize: 10 }}
+                  tickLine={{ stroke: '#cbd5e1' }}
+                />
+                <Tooltip 
+                  formatter={(value: number) => [`Companies: ${value}`, 'Total']}
+                  labelStyle={{ color: '#1e293b', fontWeight: 600 }}
+                  contentStyle={{ 
+                    backgroundColor: 'white',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+                  }}
+                />
+                <Bar
+                  dataKey="value"
+                  fill="url(#allEmployeeGradient)"
+                  radius={[0, 4, 4, 0]}
+                  cursor="pointer"
+                >
+                  {getDetailedEmployeeSizeDistribution().map((entry, index) => (
+                    <Cell 
+                      key={`cell-${index}`} 
+                      fill="url(#allEmployeeGradient)"
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* All Revenue Distribution Modal */}
+      <Dialog open={showAllRevenues} onOpenChange={setShowAllRevenues}>
+        <DialogContent className="max-w-[95vw] w-full md:w-[800px] h-[80vh] max-h-[90vh] overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100/50 border border-slate-200">
+          <DialogHeader>
+            <DialogTitle className="text-slate-800 font-semibold">All Revenue Distribution</DialogTitle>
+          </DialogHeader>
+          <div className="h-[calc(80vh-100px)] overflow-auto">
+            <ResponsiveContainer width="100%" height={500}>
+              <BarChart 
+                data={getDetailedRevenueDistribution()}
+                layout="vertical"
+                margin={{ top: 20, right: 30, left: 10, bottom: 20 }}
+                barSize={25}
+              >
+                <defs>
+                  <linearGradient id="allRevenueGradient" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="5%" stopColor="#F06292" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#F06292" stopOpacity={0.9}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis 
+                  type="number"
+                  tick={{ fill: '#475569', fontSize: 10 }}
+                  tickLine={{ stroke: '#cbd5e1' }}
+                />
+                <YAxis 
+                  dataKey="name" 
+                  type="category"
+                  width={80}
+                  tick={{ fill: '#475569', fontSize: 10 }}
+                  tickLine={{ stroke: '#cbd5e1' }}
+                />
+                <Tooltip 
+                  formatter={(value: number) => [`Companies: ${value}`, 'Total']}
+                  labelStyle={{ color: '#1e293b', fontWeight: 600 }}
+                  contentStyle={{ 
+                    backgroundColor: 'white',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+                  }}
+                />
+                <Bar
+                  dataKey="value"
+                  fill="url(#allRevenueGradient)"
+                  radius={[0, 4, 4, 0]}
+                  cursor="pointer"
+                >
+                  {getDetailedRevenueDistribution().map((entry, index) => (
+                    <Cell 
+                      key={`cell-${index}`} 
+                      fill={REVENUE_COLORS[index % REVENUE_COLORS.length]}
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* All Titles Modal */}
+      <Dialog open={showAllTitles} onOpenChange={setShowAllTitles}>
+        <DialogContent className="max-w-[95vw] w-full md:w-[800px] h-[80vh] max-h-[90vh] overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100/50 border border-slate-200">
+          <DialogHeader>
+            <DialogTitle className="text-slate-800 font-semibold">All Titles Distribution</DialogTitle>
+          </DialogHeader>
+          <div className="h-[calc(80vh-100px)] overflow-auto">
+            <ResponsiveContainer width="100%" height={Math.max(400, (userData?.fileAnalytics.titleDistribution.length || 0) * 40)}>
+              <BarChart 
+                data={userData?.fileAnalytics.titleDistribution}
+                layout="vertical"
+                margin={{ top: 20, right: 30, left: 10, bottom: 20 }}
+                barSize={25}
+              >
+                <defs>
+                  <linearGradient id="allTitlesGradient" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="5%" stopColor="#78b3fb" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#78b3fb" stopOpacity={0.9}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis 
+                  type="number"
+                  tick={{ fill: '#475569', fontSize: 10 }}
+                  tickLine={{ stroke: '#cbd5e1' }}
+                />
+                <YAxis 
+                  dataKey="name" 
+                  type="category"
+                  width={120}
+                  tick={{ fill: '#475569', fontSize: 10 }}
+                  tickLine={{ stroke: '#cbd5e1' }}
+                />
+                <Tooltip 
+                  formatter={(value: number) => [`Count: ${value}`, 'Total']}
+                  labelStyle={{ color: '#1e293b', fontWeight: 600 }}
+                  contentStyle={{ 
+                    backgroundColor: 'white',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+                  }}
+                />
+                <Bar
+                  dataKey="count"
+                  fill="url(#allTitlesGradient)"
+                  radius={[0, 4, 4, 0]}
+                  maxBarSize={20}
+                >
+                  {userData?.fileAnalytics.titleDistribution.map((entry, index) => (
+                    <Cell 
+                      key={`cell-${index}`} 
+                      fill="url(#allTitlesGradient)"
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
