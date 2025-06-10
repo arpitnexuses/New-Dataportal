@@ -173,12 +173,12 @@ export function AnalyticsModal({ isOpen, onClose, data }: AnalyticsModalProps) {
                             angle={-45} 
                             textAnchor="end" 
                             height={100}
-                            tick={{ fontSize: 12 }}
+                            tick={{ fontSize: 14 }}
                             interval={0}
                           />
                           <YAxis 
                             className="fill-muted-foreground text-xs"
-                            tick={{ fontSize: 12 }}
+                            tick={{ fontSize: 14 }}
                             tickFormatter={(value) => value.toLocaleString()}
                           />
                           <ChartTooltip 
@@ -200,11 +200,11 @@ export function AnalyticsModal({ isOpen, onClose, data }: AnalyticsModalProps) {
                             cx="50%"
                             cy="50%"
                             labelLine={false}
-                            outerRadius={100}
-                            innerRadius={50}
+                            outerRadius={180}
+                            innerRadius={80}
                             fill="#8884d8"
                             dataKey="value"
-                            label={({ name, percent }) => `${truncateText(name)} ${(percent * 100).toFixed(0)}%`}
+                            label={({ name, percent }) => `${truncateText(name, 30)} ${(percent * 100).toFixed(0)}%`}
                             isAnimationActive={false}
                             paddingAngle={2}
                           >
@@ -220,6 +220,15 @@ export function AnalyticsModal({ isOpen, onClose, data }: AnalyticsModalProps) {
                           <ChartTooltip 
                             content={<CustomTooltip />}
                             cursor={{ fill: 'rgba(0, 0, 0, 0.1)' }}
+                          />
+                          <Legend 
+                            layout="horizontal" 
+                            verticalAlign="bottom" 
+                            align="center"
+                            wrapperStyle={{
+                              fontSize: 16,
+                              paddingTop: '20px'
+                            }}
                           />
                         </RechartsPieChart>
                       )}
@@ -476,11 +485,11 @@ export function AnalyticsModal({ isOpen, onClose, data }: AnalyticsModalProps) {
                             <XAxis 
                               dataKey="name" 
                               className="fill-muted-foreground text-xs"
-                              tick={{ fontSize: 12 }}
+                              tick={{ fontSize: 14 }}
                             />
                             <YAxis 
                               className="fill-muted-foreground text-xs"
-                              tick={{ fontSize: 12 }}
+                              tick={{ fontSize: 14 }}
                               tickFormatter={(value) => value.toLocaleString()}
                             />
                             <ChartTooltip 
@@ -561,6 +570,15 @@ export function AnalyticsModal({ isOpen, onClose, data }: AnalyticsModalProps) {
                               content={<CustomTooltip />}
                               cursor={{ fill: 'rgba(0, 0, 0, 0.1)' }}
                             />
+                            <Legend 
+                              layout="horizontal" 
+                              verticalAlign="bottom" 
+                              align="center"
+                              wrapperStyle={{
+                                fontSize: 14,
+                                paddingTop: '10px'
+                              }}
+                            />
                           </RechartsPieChart>
                         </ResponsiveContainer>
                       </ChartContainer>
@@ -601,12 +619,13 @@ export function AnalyticsModal({ isOpen, onClose, data }: AnalyticsModalProps) {
                             <CartesianGrid strokeDasharray="3 3" className="stroke-border/50" />
                             <XAxis 
                               dataKey="name" 
-                              className="fill-muted-foreground"
+                              className="fill-muted-foreground text-xs"
                               angle={-45} 
                               textAnchor="end" 
                               height={100} 
+                              tick={{ fontSize: 14 }}
                             />
-                            <YAxis className="fill-muted-foreground" />
+                            <YAxis className="fill-muted-foreground text-xs" tick={{ fontSize: 14 }} />
                             <ChartTooltip content={<CustomTooltip />} />
                             <Bar 
                               dataKey="value" 
@@ -662,11 +681,11 @@ export function AnalyticsModal({ isOpen, onClose, data }: AnalyticsModalProps) {
                             <XAxis 
                               dataKey="name" 
                               className="fill-muted-foreground text-xs"
-                              tick={{ fontSize: 12 }}
+                              tick={{ fontSize: 14 }}
                             />
                             <YAxis 
                               className="fill-muted-foreground text-xs"
-                              tick={{ fontSize: 12 }}
+                              tick={{ fontSize: 14 }}
                               tickFormatter={(value) => value.toLocaleString()}
                             />
                             <ChartTooltip 
@@ -731,11 +750,11 @@ export function AnalyticsModal({ isOpen, onClose, data }: AnalyticsModalProps) {
                               angle={-45} 
                               textAnchor="end" 
                               height={100}
-                              tick={{ fontSize: 12 }}
+                              tick={{ fontSize: 14 }}
                             />
                             <YAxis 
                               className="fill-muted-foreground text-xs"
-                              tick={{ fontSize: 12 }}
+                              tick={{ fontSize: 14 }}
                               tickFormatter={(value) => value.toLocaleString()}
                             />
                             <ChartTooltip 

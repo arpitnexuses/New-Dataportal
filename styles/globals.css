@@ -98,6 +98,58 @@ body {
 .recharts-layer text,
 .recharts-pie-label-text[style],
 .recharts-layer text[style] {
-  fill: #888888 !important;
-  color: #888888 !important;
+  fill: #444444 !important;
+  color: #444444 !important;
+  font-size: 14px !important;
+}
+
+/* Ensure tooltip text is readable */
+.recharts-tooltip-wrapper {
+  font-size: 14px !important;
+}
+
+/* Make legends more readable */
+.recharts-default-legend {
+  font-size: 14px !important;
+}
+
+.recharts-legend-item-text {
+  font-size: 14px !important;
+  margin-left: 2px !important;
+  color: #444444 !important;
+  fill: #444444 !important;
+}
+
+.recharts-legend-wrapper {
+  font-size: 14px !important;
+}
+
+/* Style the colored dots in the legend */
+.recharts-legend-icon {
+  width: 12px !important;
+  height: 12px !important;
+}
+
+@media (max-width: 640px) {
+  .recharts-pie-label-text,
+  .recharts-layer text,
+  .recharts-pie-label-text[style],
+  .recharts-layer text[style] {
+    font-size: 12px !important;
+  }
+  
+  .recharts-tooltip-wrapper {
+    font-size: 12px !important;
+  }
+  
+  .recharts-default-legend,
+  .recharts-legend-item-text,
+  .recharts-legend-wrapper {
+    font-size: 12px !important;
+  }
+  
+  .recharts-legend-icon {
+    width: 10px !important;
+    height: 10px !important;
+  }
 }
