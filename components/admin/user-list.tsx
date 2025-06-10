@@ -73,6 +73,7 @@ export const UserList = forwardRef<UserListRef>((props, ref) => {
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
   const [isAddCreditsDialogOpen, setIsAddCreditsDialogOpen] = useState(false)
   const [isDeleteUserDialogOpen, setIsDeleteUserDialogOpen] = useState(false)
+  const [isAddFileDialogOpen, setIsAddFileDialogOpen] = useState(false)
   const [selectedUserEmail, setSelectedUserEmail] = useState<string>("")
 
   const fetchUsers = async () => {
@@ -140,6 +141,11 @@ export const UserList = forwardRef<UserListRef>((props, ref) => {
     } catch (error) {
       console.error("Error deleting file:", error)
     }
+  }
+
+  const handleAddFileClick = (userId: string) => {
+    setSelectedUserId(userId)
+    setIsAddFileDialogOpen(true)
   }
 
   const handleAddFileSuccess = () => {
@@ -320,6 +326,12 @@ export const UserList = forwardRef<UserListRef>((props, ref) => {
             <DropdownMenuContent align="end" className="bg-zinc-900 border-zinc-800">
               <DropdownMenuLabel className="text-zinc-400">Actions</DropdownMenuLabel>
               <DropdownMenuItem 
+                onClick={() => handleAddFileClick(user._id)}
+                className="text-blue-400 hover:bg-zinc-800 focus:bg-zinc-800"
+              >
+                Add File
+              </DropdownMenuItem>
+              <DropdownMenuItem 
                 onClick={() => handleAddCredits(user._id)}
                 className="text-green-400 hover:bg-zinc-800 focus:bg-zinc-800"
               >
@@ -417,6 +429,26 @@ export const UserList = forwardRef<UserListRef>((props, ref) => {
           }
         }}
       />
+      <Dialog open={isAddFileDialogOpen} onOpenChange={(open) => {
+        if (!open) {
+          setSelectedUserId(null)
+        }
+        setIsAddFileDialogOpen(open)
+      }}>
+        <DialogContent className="bg-zinc-900 border-zinc-800 text-white sm:max-w-[550px] [&>button]:text-white">
+          <DialogHeader>
+            <DialogTitle>Add File to User</DialogTitle>
+          </DialogHeader>
+          <AddFileForm 
+            userId={selectedUserId || ""} 
+            onSuccess={() => {
+              setIsAddFileDialogOpen(false)
+              setSelectedUserId(null)
+              handleAddFileSuccess()
+            }} 
+          />
+        </DialogContent>
+      </Dialog>
       <div className="rounded-md border border-zinc-800 bg-zinc-900">
         <Table>
           <TableHeader>
