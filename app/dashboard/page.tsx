@@ -577,12 +577,12 @@ export default function DashboardPage() {
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" horizontal={true} vertical={false} />
-                    <XAxis type="number" tick={{ fill: '#475569', fontSize: 11 }} />
+                    <XAxis type="number" tick={{ fill: '#475569', fontSize: 14 }} />
                     <YAxis 
                       dataKey="name" 
                       type="category"
                       width={120}
-                      tick={{ fill: '#475569', fontSize: 10 }}
+                      tick={{ fill: '#475569', fontSize: 13 }}
                     />
                     <Tooltip 
                       formatter={(value: number) => [`Count: ${value}`, 'Total']}
@@ -658,7 +658,7 @@ export default function DashboardPage() {
                             style={{
                               fill: '#475569',
                               color: '#475569',
-                              fontSize: 12,
+                              fontSize: isMobile ? 13 : 15,
                               fontWeight: 500,
                               paintOrder: 'stroke',
                               stroke: 'white',
@@ -694,7 +694,7 @@ export default function DashboardPage() {
                       verticalAlign="bottom" 
                       align="center"
                       wrapperStyle={{
-                        fontSize: 10,
+                        fontSize: isMobile ? 12 : 14,
                         paddingTop: '10px'
                       }}
                     />
@@ -750,7 +750,7 @@ export default function DashboardPage() {
                             style={{
                               fill: '#475569',
                               color: '#475569',
-                              fontSize: 12,
+                              fontSize: isMobile ? 13 : 15,
                               fontWeight: 500,
                               paintOrder: 'stroke',
                               stroke: 'white',
@@ -789,7 +789,7 @@ export default function DashboardPage() {
                       verticalAlign="bottom" 
                       align="center"
                       wrapperStyle={{
-                        fontSize: 10,
+                        fontSize: isMobile ? 12 : 14,
                         paddingTop: '10px'
                       }}
                     />
@@ -842,7 +842,7 @@ export default function DashboardPage() {
                             style={{
                               fill: '#475569',
                               color: '#475569',
-                              fontSize: 12,
+                              fontSize: isMobile ? 13 : 15,
                               fontWeight: 500,
                               paintOrder: 'stroke',
                               stroke: 'white',
@@ -881,7 +881,7 @@ export default function DashboardPage() {
                       verticalAlign="bottom" 
                       align="center"
                       wrapperStyle={{
-                        fontSize: 10,
+                        fontSize: isMobile ? 12 : 14,
                         paddingTop: '10px'
                       }}
                     />
@@ -920,11 +920,11 @@ export default function DashboardPage() {
                       textAnchor="end"
                       height={60}
                       interval={0}
-                      tick={{ fill: '#475569', fontSize: isMobile ? 8 : 10 }}
+                      tick={{ fill: '#475569', fontSize: isMobile ? 12 : 14 }}
                       tickLine={{ stroke: '#cbd5e1' }}
                     />
                     <YAxis 
-                      tick={{ fill: '#475569', fontSize: isMobile ? 9 : 11 }}
+                      tick={{ fill: '#475569', fontSize: isMobile ? 13 : 15 }}
                       tickLine={{ stroke: '#cbd5e1' }}
                     />
                     <Tooltip 
@@ -979,12 +979,12 @@ export default function DashboardPage() {
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" horizontal={true} vertical={false} />
-                    <XAxis type="number" tick={{ fill: '#475569', fontSize: isMobile ? 9 : 11 }} />
+                    <XAxis type="number" tick={{ fill: '#475569', fontSize: isMobile ? 12 : 14 }} />
                     <YAxis 
                       dataKey="name" 
                       type="category"
-                      width={isMobile ? 60 : 80}
-                      tick={{ fill: '#475569', fontSize: isMobile ? 9 : 11 }}
+                      width={isMobile ? 70 : 90}
+                      tick={{ fill: '#475569', fontSize: isMobile ? 12 : 14 }}
                     />
                     <Tooltip 
                       formatter={(value: number) => [`Companies: ${value}`, 'Total']}
@@ -1131,14 +1131,14 @@ export default function DashboardPage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                 <XAxis 
                   type="number"
-                  tick={{ fill: '#475569', fontSize: 10 }}
+                  tick={{ fill: '#475569', fontSize: 13 }}
                   tickLine={{ stroke: '#cbd5e1' }}
                 />
                 <YAxis 
                   dataKey="name" 
                   type="category"
-                  width={120}
-                  tick={{ fill: '#475569', fontSize: 10 }}
+                  width={130}
+                  tick={{ fill: '#475569', fontSize: 13 }}
                   tickLine={{ stroke: '#cbd5e1' }}
                 />
                 <Tooltip 
@@ -1186,14 +1186,14 @@ export default function DashboardPage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                 <XAxis 
                   type="number"
-                  tick={{ fill: '#475569', fontSize: 10 }}
+                  tick={{ fill: '#475569', fontSize: 13 }}
                   tickLine={{ stroke: '#cbd5e1' }}
                 />
                 <YAxis 
                   dataKey="name" 
                   type="category"
-                  width={80}
-                  tick={{ fill: '#475569', fontSize: 10 }}
+                  width={90}
+                  tick={{ fill: '#475569', fontSize: 13 }}
                   tickLine={{ stroke: '#cbd5e1' }}
                 />
                 <Tooltip 
@@ -1248,14 +1248,14 @@ export default function DashboardPage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                 <XAxis 
                   type="number"
-                  tick={{ fill: '#475569', fontSize: 10 }}
+                  tick={{ fill: '#475569', fontSize: 13 }}
                   tickLine={{ stroke: '#cbd5e1' }}
                 />
                 <YAxis 
                   dataKey="name" 
                   type="category"
-                  width={80}
-                  tick={{ fill: '#475569', fontSize: 10 }}
+                  width={90}
+                  tick={{ fill: '#475569', fontSize: 13 }}
                   tickLine={{ stroke: '#cbd5e1' }}
                 />
                 <Tooltip 
@@ -1310,14 +1310,14 @@ export default function DashboardPage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                 <XAxis 
                   type="number"
-                  tick={{ fill: '#475569', fontSize: 10 }}
+                  tick={{ fill: '#475569', fontSize: 13 }}
                   tickLine={{ stroke: '#cbd5e1' }}
                 />
                 <YAxis 
                   dataKey="name" 
                   type="category"
-                  width={120}
-                  tick={{ fill: '#475569', fontSize: 10 }}
+                  width={130}
+                  tick={{ fill: '#475569', fontSize: 13 }}
                   tickLine={{ stroke: '#cbd5e1' }}
                 />
                 <Tooltip 
