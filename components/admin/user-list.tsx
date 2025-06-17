@@ -42,30 +42,35 @@ import Image from "next/image"
 import { AddCreditsDialog } from "./add-credits-dialog"
 import { DeleteUserDialog } from "./delete-user-dialog"
 
+interface FileInfo {
+  id: string
+  title: string
+  filename: string
+  originalName: string
+  recordCount: number
+  columnCount: number
+  createdAt: string
+}
+
 interface User {
-  _id: string
+  id: string
   email: string
   role: string
-  userType: "workmate" | "general"
+  userType?: string
   title?: string
-  logoUrl?: string
-  createdAt: string
-  updatedAt: string
   credits: number
-  dataFiles: Array<{
-    fileId: string
-    title: string
-    filename: string
-    data: any[]
-    columns: string[]
-  }>
+  totalFiles: number
+  totalRecords: number
+  lastUpload: string | null
+  createdAt: string
+  files: FileInfo[]
 }
 
 export interface UserListRef {
   refreshUsers: () => void
 }
 
-export const UserList = forwardRef<UserListRef>((props, ref) => {
+export const UserList = forwardRef<UserListRef>((_, ref) => {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [sorting, setSorting] = useState<SortingState>([])
@@ -78,10 +83,11 @@ export const UserList = forwardRef<UserListRef>((props, ref) => {
 
   const fetchUsers = async () => {
     try {
+      setLoading(true)
       const response = await fetch("/api/admin/users")
       if (response.ok) {
         const data = await response.json()
-        setUsers(data.users)
+        setUsers(data)
       }
     } catch (error) {
       console.error("Error fetching users:", error)
@@ -111,7 +117,7 @@ export const UserList = forwardRef<UserListRef>((props, ref) => {
       }
 
       // Update the users state immediately
-      setUsers((prevUsers) => prevUsers.filter((user) => user._id !== userId))
+      setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId))
       return true
     } catch (error) {
       console.error("Error deleting user:", error)
@@ -126,17 +132,7 @@ export const UserList = forwardRef<UserListRef>((props, ref) => {
       })
 
       if (response.ok) {
-        setUsers((prevUsers) =>
-          prevUsers.map((user) => {
-            if (user._id === userId) {
-              return {
-                ...user,
-                dataFiles: user.dataFiles.filter((file) => file.fileId !== fileId),
-              }
-            }
-            return user
-          })
-        )
+        fetchUsers()
       }
     } catch (error) {
       console.error("Error deleting file:", error)
@@ -161,7 +157,7 @@ export const UserList = forwardRef<UserListRef>((props, ref) => {
   const handleAddCreditsSuccess = (newCredits: number) => {
     setUsers(prevUsers => 
       prevUsers.map(user => 
-        user._id === selectedUserId 
+        user.id === selectedUserId 
           ? { ...user, credits: newCredits } 
           : user
       )
@@ -236,11 +232,13 @@ export const UserList = forwardRef<UserListRef>((props, ref) => {
       header: "User Type",
       cell: ({ row }) => {
         const userType = row.getValue("userType") as string
-        return (
+        return userType ? (
           <Badge variant={userType === "workmate" ? "default" : "secondary"}>
             {userType === "workmate" ? "Workmate User" : "General User"}
           </Badge>
-        )
+        ) : (
+          <span>-</span>
+        );
       },
     },
     {
@@ -264,25 +262,25 @@ export const UserList = forwardRef<UserListRef>((props, ref) => {
       },
     },
     {
-      accessorKey: "dataFiles",
+      accessorKey: "files",
       header: "Files",
       cell: ({ row }) => {
-        const files = row.getValue("dataFiles") as Array<{ fileId: string; title: string; filename: string; data: any[]; columns: string[] }>
+        const files = row.getValue("files") as FileInfo[]
         return (
           <div className="flex flex-col gap-1">
-            {files.map((file) => (
-              <div key={file.fileId} className="flex items-center gap-2">
+            {files && files.map((file) => (
+              <div key={file.id} className="flex items-center gap-2">
                 <div className="flex flex-col">
-                  <span className="text-sm font-medium">{file.filename}</span>
+                  <span className="text-sm font-medium">{file.originalName || file.filename}</span>
                   <span className="text-xs text-zinc-400">
-                    {file.data?.length || 0} rows, {file.columns?.length || 0} columns
+                    {file.recordCount} rows, {file.columnCount} columns
                   </span>
                 </div>
                 <Button
                   variant="ghost"
                   size="icon"
                   className="h-6 w-6 p-0 hover:bg-red-100 hover:text-red-600"
-                  onClick={() => handleDeleteFile(row.original._id, file.fileId)}
+                  onClick={() => handleDeleteFile(row.original.id, file.id)}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -308,12 +306,14 @@ export const UserList = forwardRef<UserListRef>((props, ref) => {
     },
     {
       accessorKey: "createdAt",
-      header: "Created",
-      cell: ({ row }) => new Date(row.getValue("createdAt")).toLocaleDateString(),
+      header: "Created At",
+      cell: ({ row }) => {
+        const createdAt = row.getValue("createdAt") as string
+        return new Date(createdAt).toLocaleDateString()
+      },
     },
     {
-      accessorKey: "actions",
-      header: "Actions",
+      id: "actions",
       cell: ({ row }) => {
         const user = row.original
         return (
@@ -326,21 +326,21 @@ export const UserList = forwardRef<UserListRef>((props, ref) => {
             <DropdownMenuContent align="end" className="bg-zinc-900 border-zinc-800">
               <DropdownMenuLabel className="text-zinc-400">Actions</DropdownMenuLabel>
               <DropdownMenuItem 
-                onClick={() => handleAddFileClick(user._id)}
-                className="text-blue-400 hover:bg-zinc-800 focus:bg-zinc-800"
+                onClick={() => handleAddFileClick(user.id)}
+                className="text-blue-400 hover:bg-zinc-800 hover:text-blue-400 focus:bg-zinc-800 focus:text-blue-400"
               >
                 Add File
               </DropdownMenuItem>
               <DropdownMenuItem 
-                onClick={() => handleAddCredits(user._id)}
-                className="text-green-400 hover:bg-zinc-800 focus:bg-zinc-800"
+                onClick={() => handleAddCredits(user.id)}
+                className="text-green-400 hover:bg-zinc-800 hover:text-green-400 focus:bg-zinc-800 focus:text-green-400"
               >
                 Add Credits
               </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-zinc-800" />
               <DropdownMenuItem 
-                onClick={() => handleDeleteUserClick(user._id, user.email)}
-                className="text-red-400 hover:bg-zinc-800 focus:bg-zinc-800"
+                onClick={() => handleDeleteUserClick(user.id, user.email)}
+                className="text-red-400 hover:bg-zinc-800 hover:text-red-400 focus:bg-zinc-800 focus:text-red-400"
               >
                 Delete User
               </DropdownMenuItem>
@@ -352,7 +352,7 @@ export const UserList = forwardRef<UserListRef>((props, ref) => {
   ]
 
   const table = useReactTable({
-    data: users,
+    data: users || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
@@ -394,6 +394,17 @@ export const UserList = forwardRef<UserListRef>((props, ref) => {
     )
   }
 
+  // Safely get the row model and rows
+  let rows: any[] = [];
+  try {
+    const rowModel = table?.getRowModel?.();
+    rows = rowModel?.rows || [];
+  } catch (error) {
+    console.error("Error getting row model:", error);
+    // Fall back to empty array if there's an error
+    rows = [];
+  }
+
   return (
     <>
       <AddCreditsDialog
@@ -418,7 +429,7 @@ export const UserList = forwardRef<UserListRef>((props, ref) => {
           if (selectedUserId) {
             try {
               // Update local state first for immediate UI feedback
-              setUsers((prevUsers) => prevUsers.filter((user) => user._id !== selectedUserId))
+              setUsers((prevUsers) => prevUsers.filter((user) => user.id !== selectedUserId))
               // Then refresh from server to ensure consistency
               await fetchUsers()
             } catch (error) {
@@ -470,14 +481,14 @@ export const UserList = forwardRef<UserListRef>((props, ref) => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
+            {rows.length > 0 ? (
+              rows.map((row) => (
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                   className="border-zinc-800 hover:bg-zinc-900"
                 >
-                  {row.getVisibleCells().map((cell) => (
+                  {row.getVisibleCells().map((cell: any) => (
                     <TableCell key={cell.id} className="text-zinc-300">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>

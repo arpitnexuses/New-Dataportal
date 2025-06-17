@@ -277,7 +277,8 @@ const WORKMATE_USER_COLUMNS = [
 
 // Define the standard column order and mapping for General User
 const GENERAL_USER_COLUMNS = [
-  'full_name',
+  'first_name',
+  'last_name',
   'title',
   'company_name',
   'email',
@@ -329,7 +330,8 @@ const COLUMN_DISPLAY_NAMES: Record<string, string> = {
   tm_remarks: "TM Remarks",
 
   // General User columns
-  full_name: "Full Name",
+  first_name: "First Name",
+  last_name: "Last Name",
   title: "Title",
   company_name: "Company Name",
   email: "Email",
@@ -639,7 +641,8 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
         'country_contact_person',
         'email_id'
       ] : [
-        'full_name',
+        'first_name',
+        'last_name',
         'company_name',
         'email',
         'personal_phone',
@@ -1137,9 +1140,8 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
       // Check for key columns to pin
       if ('Contact_Name' in firstRow) pinnedColumns.push('Contact_Name');
       if ('contact_name' in firstRow) pinnedColumns.push('contact_name');
-      if ('full_name' in firstRow) pinnedColumns.push('full_name');
-      // Remove Last_Name from being pinned
-      // if ('Last_Name' in firstRow) pinnedColumns.push('Last_Name');
+      if ('first_name' in firstRow) pinnedColumns.push('first_name');
+      if ('last_name' in firstRow) pinnedColumns.push('last_name');
       // if ('account_name' in firstRow) pinnedColumns.push('account_name');
       
       // Update column pinning state
@@ -1427,7 +1429,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                               const firstRow = userData?.dataFiles[selectedFileIndex]?.data[0];
                               const isWorkmateUser = firstRow && ('workmates_remark' in firstRow || 'tm_remarks' in firstRow);
                               
-                              // Define essential columns based on user type - limited to 5 most important
+                              // Define essential columns based on user type - limited to most important
                               const essentialColumns = isWorkmateUser ? [
                                 'contact_name',
                                 'account_name',
@@ -1437,7 +1439,8 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                                 'technologies',
                                 'email_id'
                               ] : [
-                                'full_name',
+                                'first_name',
+                                'last_name',
                                 'company_name',
                                 'email',
                                 'personal_phone',
@@ -2152,7 +2155,7 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                           const firstRow = userData?.dataFiles[selectedFileIndex]?.data[0];
                           const isWorkmateUser = firstRow && ('workmates_remark' in firstRow || 'tm_remarks' in firstRow);
                           
-                          // Define essential columns based on user type - limited to 5 most important
+                          // Define essential columns based on user type - limited to most important
                           const essentialColumns = isWorkmateUser ? [
                             'contact_name',
                             'account_name',
@@ -2162,7 +2165,8 @@ export function DataTable({ selectedFileIndex, activeFilters, setIsFilterOpen, a
                             'technologies',
                             'email_id'
                           ] : [
-                            'full_name',
+                            'first_name',
+                            'last_name',
                             'company_name',
                             'email',
                             'personal_phone',
