@@ -4,7 +4,7 @@ import { User } from "@/lib/models/user"
 import { DataFile } from "@/lib/models/dataFile"
 import { isAdmin } from "@/lib/auth"
 import { parse } from "papaparse"
-import * as XLSX from 'xlsx'
+import ExcelJS from 'exceljs'
 
 // All supported columns for workmate user
 const WORKMATE_COLUMNS = [
@@ -38,7 +38,8 @@ const WORKMATE_COLUMNS = [
 
 // All supported columns for general user
 const GENERAL_COLUMNS = [
-  'full_name',
+  'first_name',
+  'last_name',
   'title',
   'company_name',
   'email',
@@ -100,10 +101,39 @@ export async function POST(
     // Handle different file types
     if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
       const fileBuffer = await file.arrayBuffer()
-      const workbook = XLSX.read(fileBuffer)
-      const firstSheetName = workbook.SheetNames[0]
-      const worksheet = workbook.Sheets[firstSheetName]
-      parsedData = XLSX.utils.sheet_to_json(worksheet)
+      const workbook = new ExcelJS.Workbook()
+      await workbook.xlsx.load(fileBuffer)
+      
+      // Get the first worksheet
+      const worksheet = workbook.worksheets[0]
+      if (!worksheet) {
+        return NextResponse.json({ error: "No worksheet found in the Excel file." }, { status: 400 })
+      }
+      
+      // Get headers from the first row
+      const headers: string[] = []
+      worksheet.getRow(1).eachCell((cell, colNumber) => {
+        headers[colNumber - 1] = cell.value ? cell.value.toString().trim() : ''
+      })
+      
+      // Process data rows
+      parsedData = []
+      worksheet.eachRow((row, rowNumber) => {
+        // Skip header row
+        if (rowNumber === 1) return
+        
+        const rowData: Record<string, any> = {}
+        row.eachCell((cell, colNumber) => {
+          if (colNumber <= headers.length && headers[colNumber - 1]) {
+            rowData[headers[colNumber - 1]] = cell.value
+          }
+        })
+        
+        // Only add rows that have data
+        if (Object.keys(rowData).length > 0) {
+          parsedData.push(rowData)
+        }
+      })
     } else if (file.name.endsWith('.csv')) {
       // Process the new file
       const fileContent = await file.text()
@@ -125,60 +155,42 @@ export async function POST(
 
     // Ensure the file has at least some column headers
     const fileHeaders = Object.keys(parsedData[0] || {})
-    if (fileHeaders.length === 0) {
-      return NextResponse.json({ error: "The uploaded file has no column headers." }, { status: 400 })
+    if (!fileHeaders || fileHeaders.length === 0) {
+      return NextResponse.json({ error: "No column headers found in the file." }, { status: 400 })
     }
 
-    // Clean and validate the data
-    const cleanedData = parsedData.map((row, index) => {
-      // Get original headers
-      const originalHeaders = Object.keys(row);
-      console.log('Original headers:', originalHeaders);
-      
-      // Create a new object for each row
-      const cleanedRow: Record<string, string> = {};
-      
-      // First pass: just directly copy all the data with its original field names
-      originalHeaders.forEach(header => {
-        const value = (row[header] || '').toString().trim();
-        cleanedRow[header] = value;
-        
-        // Also store the same data with lowercase keys to ensure consistent access
-        cleanedRow[header.toLowerCase()] = value;
-      });
-      
-      console.log('Cleaned row with all fields:', cleanedRow);
-      return cleanedRow;
-    });
+    // Convert headers to lowercase for case-insensitive comparison
+    const lowercaseHeaders = fileHeaders.map(h => h.toLowerCase())
 
-    // Store the original column names
-    const originalColumns = Object.keys(parsedData[0] || {});
-    const lowerCaseColumns = originalColumns.map(col => col.toLowerCase());
+    // Check if any of the required columns are present
+    const hasRequiredColumns = ALL_SUPPORTED_COLUMNS.some(col => lowercaseHeaders.includes(col))
+    if (!hasRequiredColumns) {
+      return NextResponse.json({ 
+        error: "The file does not contain any of the required columns. Please check the file format." 
+      }, { status: 400 })
+    }
 
-    // Create a new data file record with the cleaned data
+    // Create a new DataFile document
     const dataFile = await DataFile.create({
+      data: parsedData,
+      columns: fileHeaders,
       filename: file.name,
-      originalName: file.name,
-      columns: lowerCaseColumns, // Store lowercase column names for consistency
-      data: cleanedData,
+      originalName: file.name
     })
 
-    // Add the new file to user's dataFiles array
+    // Add the file reference to the user's dataFiles array
     user.dataFiles.push({
       fileId: dataFile._id,
       title,
-      createdAt: new Date(),
+      createdAt: new Date()
     })
 
     await user.save()
 
-    return NextResponse.json({
-      message: "File uploaded successfully",
-      dataFile: {
-        id: dataFile._id,
-        title,
-        filename: dataFile.originalName,
-      },
+    return NextResponse.json({ 
+      message: "File uploaded successfully", 
+      fileId: dataFile._id,
+      rowCount: parsedData.length 
     })
   } catch (error) {
     console.error("Error uploading file:", error)

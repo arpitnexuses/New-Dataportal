@@ -133,8 +133,8 @@ export function CreateUserForm({ onSuccess, onUserCreated }: CreateUserFormProps
                 <SelectValue placeholder="Select user type" />
               </SelectTrigger>
               <SelectContent className="bg-[#1C1C1C] border-zinc-800">
-                <SelectItem value="workmate">Workmate User</SelectItem>
-                <SelectItem value="general">General User</SelectItem>
+                <SelectItem value="workmate" className="text-white hover:bg-zinc-800 focus:bg-zinc-800 focus:text-white">Workmate User</SelectItem>
+                <SelectItem value="general" className="text-white hover:bg-zinc-800 focus:bg-zinc-800 focus:text-white">General User</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -159,7 +159,7 @@ export function CreateUserForm({ onSuccess, onUserCreated }: CreateUserFormProps
               type="file"
               onChange={(e) => setFile(e.target.files?.[0] || null)}
               accept=".csv,.xlsx,.xls"
-              className="bg-[#1C1C1C] border-zinc-800 text-white file:bg-zinc-900 file:text-white file:border-0 file:mr-4 file:py-2 file:px-4 hover:file:bg-zinc-800"
+              className="bg-[#1C1C1C] border-zinc-800 text-white file:bg-zinc-900 file:text-white file:border-0 file:mr-4 file:py-2 file:px-4 hover:file:bg-zinc-800 flex items-center"
             />
             <p className="text-sm text-zinc-500">Upload a CSV or Excel file with the data to be displayed</p>
           </div>

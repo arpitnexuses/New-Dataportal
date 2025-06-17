@@ -3,7 +3,7 @@ import connectToDatabase from "@/lib/mongodb"
 import { User } from "@/lib/models/user"
 import { DataFile } from "@/lib/models/dataFile"
 import { getCurrentUser } from "@/lib/auth"
-import * as XLSX from 'xlsx'
+import ExcelJS from 'exceljs'
 
 export async function POST(request: NextRequest) {
   try {
@@ -67,25 +67,45 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No data to export" }, { status: 400 })
     }
 
-    // Create Excel workbook - use the ordered columns to create the sheet
-    const ws = XLSX.utils.json_to_sheet(allData, { header: columnsOrder })
-    const wb = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(wb, ws, 'Data')
-
     let buffer: Buffer;
     let contentType: string;
     let filename: string;
 
     // Generate the appropriate format
     if (format === 'csv') {
+      // Generate CSV using ExcelJS
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('Data');
+      
+      // Add headers
+      worksheet.addRow(columnsOrder);
+      
+      // Add data rows
+      allData.forEach(item => {
+        const row = columnsOrder.map(col => item[col] || '');
+        worksheet.addRow(row);
+      });
+      
       // Generate CSV
-      const csv = XLSX.utils.sheet_to_csv(ws);
-      buffer = Buffer.from(csv);
+      buffer = await workbook.csv.writeBuffer() as Buffer;
       contentType = 'text/csv';
       filename = 'exported_data.csv';
     } else {
       // Default to XLSX
-      buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('Data');
+      
+      // Add headers
+      worksheet.addRow(columnsOrder);
+      
+      // Add data rows
+      allData.forEach(item => {
+        const row = columnsOrder.map(col => item[col] || '');
+        worksheet.addRow(row);
+      });
+      
+      // Generate Excel file
+      buffer = await workbook.xlsx.writeBuffer() as Buffer;
       contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
       filename = 'exported_data.xlsx';
     }

@@ -6,7 +6,7 @@ import { hashPassword, isAdmin } from "@/lib/auth"
 import { parse } from "papaparse"
 import type { IDataFile } from "@/lib/models/dataFile"
 import mongoose from "mongoose"
-import * as XLSX from 'xlsx'
+import ExcelJS from 'exceljs'
 
 interface PopulatedUserDataFile {
   fileId: IDataFile & { _id: mongoose.Types.ObjectId }
@@ -86,7 +86,8 @@ const WORKMATE_COLUMNS = [
 ]
 
 const GENERAL_COLUMNS = [
-  'full_name',
+  'first_name',
+  'last_name',
   'title',
   'company_name',
   'email',
@@ -115,31 +116,65 @@ export async function GET(request: NextRequest) {
     }
 
     await connectToDatabase()
-    const users = await User.find({ role: "user" })
-      .select("-password")
+
+    // Get all users with their data files, excluding admin users
+    const users = await User.find({ role: { $ne: "admin" } })
       .populate({
         path: "dataFiles.fileId",
-        model: "DataFile",
-        select: "filename originalName data columns"
+        model: DataFile,
+        select: "filename originalName data columns createdAt"
       })
+      .select("-password") // Exclude password field
       .lean()
-      .exec() as unknown as PopulatedUser[]
+      .exec()
 
-    return NextResponse.json({
-      users: users.map((user) => ({
-        ...user,
-        _id: user._id.toString(),
-        createdAt: user.createdAt.toISOString(),
-        updatedAt: user.updatedAt.toISOString(),
-        dataFiles: (user.dataFiles || []).map(file => ({
-          fileId: file.fileId?._id?.toString() || null,
+    // Format the response
+    const formattedUsers = users.map(user => {
+      // Calculate total records across all files
+      const totalRecords = user.dataFiles.reduce((sum, file) => {
+        const dataFile = file.fileId as IDataFile
+        return sum + (dataFile?.data?.length || 0)
+      }, 0)
+
+      // Get the most recent file's date
+      let mostRecentDate = null
+      if (user.dataFiles.length > 0) {
+        mostRecentDate = user.dataFiles.reduce((latest, file) => {
+          const fileDate = new Date(file.createdAt)
+          return fileDate > latest ? fileDate : latest
+        }, new Date(0))
+      }
+
+      // Format files with metadata
+      const files = user.dataFiles.map(file => {
+        const dataFile = file.fileId as any;
+        return {
+          id: dataFile._id,
           title: file.title,
-          filename: file.fileId?.originalName || 'Unknown',
-          data: file.fileId?.data || [],
-          columns: file.fileId?.columns || []
-        })).filter(file => file.fileId !== null),
-      })),
+          filename: dataFile.filename || "Unknown",
+          originalName: dataFile.originalName || "Unknown",
+          recordCount: dataFile.data?.length || 0,
+          columnCount: dataFile.columns?.length || 0,
+          createdAt: file.createdAt
+        };
+      });
+
+      return {
+        id: user._id,
+        email: user.email,
+        role: user.role,
+        userType: user.userType,
+        title: user.title,
+        credits: user.credits || 0,
+        totalFiles: user.dataFiles.length,
+        totalRecords: totalRecords,
+        lastUpload: mostRecentDate,
+        createdAt: user.createdAt,
+        files: files
+      }
     })
+
+    return NextResponse.json(formattedUsers)
   } catch (error) {
     console.error("Error fetching users:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
@@ -181,10 +216,39 @@ export async function POST(request: NextRequest) {
 
     // Handle Excel files
     if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
-      const workbook = XLSX.read(fileBuffer)
-      const firstSheetName = workbook.SheetNames[0]
-      const worksheet = workbook.Sheets[firstSheetName]
-      parsedData = XLSX.utils.sheet_to_json(worksheet)
+      const workbook = new ExcelJS.Workbook()
+      await workbook.xlsx.load(fileBuffer)
+      
+      // Get the first worksheet
+      const worksheet = workbook.worksheets[0]
+      if (!worksheet) {
+        return NextResponse.json({ error: "No worksheet found in the Excel file." }, { status: 400 })
+      }
+      
+      // Get headers from the first row
+      const headers: string[] = []
+      worksheet.getRow(1).eachCell((cell, colNumber) => {
+        headers[colNumber - 1] = cell.value ? cell.value.toString().trim() : ''
+      })
+      
+      // Process data rows
+      parsedData = []
+      worksheet.eachRow((row, rowNumber) => {
+        // Skip header row
+        if (rowNumber === 1) return
+        
+        const rowData: Record<string, any> = {}
+        row.eachCell((cell, colNumber) => {
+          if (colNumber <= headers.length && headers[colNumber - 1]) {
+            rowData[headers[colNumber - 1]] = cell.value
+          }
+        })
+        
+        // Only add rows that have data
+        if (Object.keys(rowData).length > 0) {
+          parsedData.push(rowData)
+        }
+      })
     } 
     // Handle CSV files
     else if (file.name.endsWith('.csv')) {
@@ -200,70 +264,55 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unsupported file format. Please upload an Excel (.xlsx, .xls) or CSV file." }, { status: 400 })
     }
 
-    // Basic validation - ensure there's data
+    // Basic validation
     if (!parsedData || parsedData.length === 0) {
       return NextResponse.json({ error: "The uploaded file contains no data." }, { status: 400 })
     }
 
-    // Process and clean the data
-    const cleanedData = parsedData.map((row, index) => {
-      // Get original headers
-      const originalHeaders = Object.keys(row);
-      
-      // Create a new object for each row
-      const cleanedRow: Record<string, string> = {};
-      
-      // First pass: just directly copy all the data with its original field names
-      originalHeaders.forEach(header => {
-        const value = (row[header] || '').toString().trim();
-        cleanedRow[header] = value;
-        
-        // Also store the same data with lowercase keys to ensure consistent access
-        cleanedRow[header.toLowerCase()] = value;
-      });
-      
-      console.log('Cleaned row with all fields:', cleanedRow);
-      return cleanedRow;
-    });
+    const fileHeaders = Object.keys(parsedData[0] || {})
+    if (!fileHeaders || fileHeaders.length === 0) {
+      return NextResponse.json({ error: "No column headers found in the file." }, { status: 400 })
+    }
 
-    // Store the original column names
-    const originalColumns = Object.keys(parsedData[0] || {});
-    const lowerCaseColumns = originalColumns.map(col => col.toLowerCase());
-
-    // Create the data file
+    // Create a new data file
     const dataFile = await DataFile.create({
+      data: parsedData,
+      columns: fileHeaders,
       filename: file.name,
-      originalName: file.name,
-      columns: lowerCaseColumns, // Store lowercase column names for consistency
-      data: cleanedData,
+      originalName: file.name
     })
 
-    // Create the user with the data file
+    // Create a new user with the uploaded file
     const hashedPassword = await hashPassword(password)
-    const newUser = await User.create({
+    const user = await User.create({
       email,
       password: hashedPassword,
       role: "user",
       userType,
       title,
+      credits: 0,
       dataFiles: [{
         fileId: dataFile._id,
         title,
-      }],
+        createdAt: new Date()
+      }]
     })
 
-    return NextResponse.json(
-      {
-        message: "User created successfully",
-        user: {
-          id: newUser._id,
-          email: newUser.email,
+    // Return success response with user data
+    return NextResponse.json({
+      message: "User created successfully",
+      user: {
+        id: user._id,
+        email: user.email,
+        role: user.role,
+        credits: user.credits,
+        files: [{
+          id: dataFile._id,
           title,
-          userType,
-        },
-      },
-      { status: 201 },
-    )
+          recordCount: parsedData.length
+        }]
+      }
+    })
   } catch (error) {
     console.error("Error creating user:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })

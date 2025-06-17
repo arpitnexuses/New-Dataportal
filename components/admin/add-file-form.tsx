@@ -98,7 +98,7 @@ export function AddFileForm({ userId, onSuccess }: AddFileFormProps) {
           accept=".csv,.xlsx,.xls"
           onChange={(e) => setFile(e.target.files?.[0] || null)}
           required
-          className="bg-zinc-800 border-zinc-700 text-white file:bg-zinc-700 file:text-white file:border-0 file:mr-4 file:py-2 file:px-4 hover:file:bg-zinc-600"
+          className="bg-zinc-800 border-zinc-700 text-white file:bg-zinc-700 file:text-white file:border-0 file:mr-4 file:py-2 file:px-4 hover:file:bg-zinc-600 flex items-center"
         />
         <p className="text-sm text-zinc-400">Upload a CSV or Excel file with the data to be displayed</p>
       </div>
