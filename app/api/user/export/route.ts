@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
       });
       
       // Generate CSV
-      buffer = await workbook.csv.writeBuffer() as Buffer;
+      buffer = await workbook.csv.writeBuffer() as unknown as Buffer;
       contentType = 'text/csv';
       filename = 'exported_data.csv';
     } else {
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
       });
       
       // Generate Excel file
-      buffer = await workbook.xlsx.writeBuffer() as Buffer;
+      buffer = await workbook.xlsx.writeBuffer() as unknown as Buffer;
       contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
       filename = 'exported_data.xlsx';
     }
